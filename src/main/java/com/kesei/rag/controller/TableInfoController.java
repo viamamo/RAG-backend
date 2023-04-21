@@ -262,7 +262,6 @@ public class TableInfoController {
         if (tableInfo == null) {
             throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
         }
-        // TODO 转换存疑
         MetaTable metaTable = JSONUtil.toBean(tableInfo.getContent(), MetaTable.class);
         SqlBuilder sqlBuilder = new SqlBuilder();
         return ResponseUtils.success(sqlBuilder.buildCreateTableSql(metaTable));

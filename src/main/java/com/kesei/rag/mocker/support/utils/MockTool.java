@@ -1,5 +1,6 @@
 package com.kesei.rag.mocker.support.utils;
 
+import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.FakerType;
 import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.MockType;
@@ -23,10 +24,14 @@ public class MockTool {
     private static final Map<String, FakerType> FAKER_TYPE_MAP =new HashMap<>();
     private static final List<String> FAKER_TYPE_LIST =new ArrayList<>();
     
+    
+    private static final Map<String, DatabaseType> DATABASE_TYPE_MAP =new HashMap<>();
+    private static final List<String> DATABASE_TYPE_LIST =new ArrayList<>();
+    
     @PostConstruct
     public void init() {
         Stream.of(MockType.values()).forEach((mockType -> {
-            MOCK_TYPE_MAP.put(mockType.getValue(), mockType);
+            MOCK_TYPE_MAP.put(mockType.toString(), mockType);
             MOCK_TYPE_LIST.add(mockType.getValue());
         }));
         Stream.of(FieldType.values()).forEach(fieldType -> {
@@ -34,8 +39,12 @@ public class MockTool {
             FIELD_TYPE_LIST.add(fieldType.getValue());
         });
         Stream.of(FakerType.values()).forEach(fakerType -> {
-            FAKER_TYPE_MAP.put(fakerType.getValue(), fakerType);
+            FAKER_TYPE_MAP.put(fakerType.toString(), fakerType);
             FAKER_TYPE_LIST.add(fakerType.getValue());
+        });
+        Stream.of(DatabaseType.values()).forEach(databaseType -> {
+            DATABASE_TYPE_MAP.put(databaseType.toString(), databaseType);
+            DATABASE_TYPE_LIST.add(databaseType.toString());
         });
     }
     
@@ -58,5 +67,12 @@ public class MockTool {
     }
     public static FakerType getFakerTypeByValue(String value) {
         return FAKER_TYPE_MAP.getOrDefault(value, null);
+    }
+    
+    public static List<String> getDatabaseTypeList() {
+        return DATABASE_TYPE_LIST;
+    }
+    public static DatabaseType getDatabaseTypeByName(String name) {
+        return DATABASE_TYPE_MAP.getOrDefault(name, null);
     }
 }

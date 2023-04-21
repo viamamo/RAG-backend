@@ -40,7 +40,6 @@ public class TableInfoServiceImpl extends ServiceImpl<TableInfoMapper, TableInfo
             }
             // 校验字段内容
             try {
-                // TODO 存疑
                 MetaTable metaTable = JSONUtil.toBean(content, MetaTable.class);
                 GeneratorFacade.validSchema(metaTable);
             } catch (Exception e) {

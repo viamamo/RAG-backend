@@ -7,8 +7,8 @@ public class Constants {
     
     // sort
     
-    public static final String SORT_ORDER_ASC="ascend";
-    public static final String SORT_ORDER_DESC = " descend";
+    public static final String SORT_ORDER_ASC="ASC";
+    public static final String SORT_ORDER_DESC = "DESC";
     public static final String DEFAULT_SORT_COLUMN="id";
     
     // pagination
@@ -34,7 +34,7 @@ public class Constants {
     // mock
     
     public static final Integer SIMPLE_MIN_MOCK_NUM=1;
-    public static final Integer SIMPLE_MAX_MOCK_NUM=500;
+    public static final Integer SIMPLE_MAX_MOCK_NUM=1000;
     public static final Integer SIMPLE_DEFAULT_MOCK_NUM=20;
     
     // dialect
@@ -87,4 +87,8 @@ public class Constants {
     public static final String FRONT_CODE_TEMPLATE="typescript_type.ftl";
     public static final String JAVA_ENTITY_TEMPLATE="java_entity.ftl";
     public static final String JAVA_OBJECT_TEMPLATE="java_object.ftl";
+    
+    // database
+    
+    public static final Integer MAX_ACTIVE_CONNECTION=20;
 }

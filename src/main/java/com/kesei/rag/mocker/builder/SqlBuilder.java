@@ -11,7 +11,6 @@ import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -88,9 +87,7 @@ public class SqlBuilder {
         }
         String fieldStr = fieldStrBuilder.toString();
         // 填充模板
-        String result = String.format(template, tablePrefixComment, tableName, fieldStr, tableSuffixComment);
-        log.info("sql result = " + result);
-        return result;
+        return String.format(template, tablePrefixComment, tableName, fieldStr, tableSuffixComment);
     }
     
     /**
@@ -139,7 +136,6 @@ public class SqlBuilder {
     
     /**
      * 构造插入数据 SQL
-     * e.g. INSERT INTO report (id, content) VALUES (1, '这个有点问题吧');
      *
      * @param metaTable 表概要
      * @param dataList 数据列表
