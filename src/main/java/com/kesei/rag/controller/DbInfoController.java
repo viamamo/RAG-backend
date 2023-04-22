@@ -72,16 +72,11 @@ public class DbInfoController{
         if (dbInfoPostRequest == null || dbInfoPostRequest.getId() <= 0) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
-        UserInfo currentUser = userInfoService.getCurrentUser(request);
         long id = dbInfoPostRequest.getId();
         // 判断是否存在
         DbInfo oldDbInfo = dbInfoService.getById(id);
         if (oldDbInfo == null) {
             throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        // 仅本人或管理员可删除
-        if (!oldDbInfo.getUserId().equals(currentUser.getId()) && !userInfoService.isAdmin(request)) {
-            throw new GenericException(ResponseCode.UNAUTHORIZED_ERROR);
         }
         boolean b = dbInfoService.removeById(id);
         return ResponseUtils.success(b);

@@ -34,7 +34,7 @@ public class Constants {
     // mock
     
     public static final Integer SIMPLE_MIN_MOCK_NUM=1;
-    public static final Integer SIMPLE_MAX_MOCK_NUM=1000;
+    public static final Integer SIMPLE_MAX_MOCK_NUM=100000;
     public static final Integer SIMPLE_DEFAULT_MOCK_NUM=20;
     
     // dialect

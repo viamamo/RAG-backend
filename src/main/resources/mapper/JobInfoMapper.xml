@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kesei.rag.mapper.JobInfoMapper">
+
+    <resultMap id="BaseResultMap" type="com.kesei.rag.entity.po.JobInfo">
+        <id property="id" column="id" jdbcType="BIGINT"/>
+        <result property="dbId" column="dbId" jdbcType="BIGINT"/>
+        <result property="finishedNum" column="finishedNum" jdbcType="BIGINT"/>
+        <result property="mockNum" column="mockNum" jdbcType="BIGINT"/>
+        <result property="status" column="status" jdbcType="TINYINT"/>
+        <result property="content" column="content" jdbcType="VARCHAR"/>
+        <result property="tableName" column="tableName" jdbcType="VARCHAR"/>
+        <result property="dbName" column="dbName" jdbcType="VARCHAR"/>
+        <result property="dbType" column="dbType" jdbcType="VARCHAR"/>
+        <result property="property" column="property" jdbcType="VARCHAR"/>
+        <result property="host" column="host" jdbcType="VARCHAR"/>
+        <result property="port" column="port" jdbcType="INTEGER"/>
+        <result property="exception" column="exception" jdbcType="VARCHAR"/>
+        <result property="userId" column="userId" jdbcType="BIGINT"/>
+        <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+        <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+        <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+    </resultMap>
+
+    <!--    <sql id="Base_Column_List">-->
+    <!--        id,name,content,userId,createTime,updateTime,isDelete-->
+    <!--    </sql>-->
+</mapper>

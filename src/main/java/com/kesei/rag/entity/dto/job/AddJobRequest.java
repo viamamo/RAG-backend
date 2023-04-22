@@ -7,7 +7,7 @@ import lombok.Data;
  * @author kesei
  */
 @Data
-public class SimpleExecutionRequest extends GenericPostRequest {
+public class AddJobRequest extends GenericPostRequest {
     private Long dbInfoId;
-    private String sql;
+    private String content;
 }

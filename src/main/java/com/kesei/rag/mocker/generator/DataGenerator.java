@@ -12,11 +12,12 @@ public interface DataGenerator {
     /**
      * 生成
      *
-     * @param field 字段信息
+     * @param metaField 字段信息
      * @param rowNum 行数
      * @return 生成的数据列表
      */
-    List<String> doGenerate(MetaTable.MetaField field, int rowNum);
+    List<String> doGenerate(MetaTable.MetaField metaField, int rowNum);
     
+    List<String> doGenerateBlock(MetaTable.MetaField metaField, int blockNumber, int blockSize);
 }
 

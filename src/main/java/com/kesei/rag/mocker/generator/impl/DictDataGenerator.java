@@ -20,8 +20,8 @@ public class DictDataGenerator implements DataGenerator {
     
     private static final DictInfoService dictInfoService = SpringContextUtils.getBean(DictInfoService.class);
     @Override
-    public List<String> doGenerate(MetaTable.MetaField field, int rowNum) {
-        String mockParams = field.getMockParams();
+    public List<String> doGenerate(MetaTable.MetaField metaField, int rowNum) {
+        String mockParams = metaField.getMockParams();
         long id = Long.parseLong(mockParams);
         DictInfo dictInfo = dictInfoService.getById(id);
         if (dictInfo == null) {
@@ -30,6 +30,23 @@ public class DictDataGenerator implements DataGenerator {
         List<String> wordList = JSONUtil.parseArray(dictInfo.getContent()).toList(String.class);
         List<String> list = new ArrayList<>(rowNum);
         for (int i = 0; i < rowNum; i++) {
+            String randomStr = wordList.get(RandomUtils.nextInt(0, wordList.size()));
+            list.add(randomStr);
+        }
+        return list;
+    }
+    
+    @Override
+    public List<String> doGenerateBlock(MetaTable.MetaField metaField, int blockNumber, int blockSize) {
+        String mockParams = metaField.getMockParams();
+        long id = Long.parseLong(mockParams);
+        DictInfo dictInfo = dictInfoService.getById(id);
+        if (dictInfo == null) {
+            throw new GenericException(ResponseCode.NOT_FOUND_ERROR, "词库不存在");
+        }
+        List<String> wordList = JSONUtil.parseArray(dictInfo.getContent()).toList(String.class);
+        List<String> list = new ArrayList<>(blockSize);
+        for (int i = 0; i < blockSize; i++) {
             String randomStr = wordList.get(RandomUtils.nextInt(0, wordList.size()));
             list.add(randomStr);
         }

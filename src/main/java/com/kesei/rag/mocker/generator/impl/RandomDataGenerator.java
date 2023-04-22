@@ -27,4 +27,18 @@ public class RandomDataGenerator implements DataGenerator {
         }
         return list;
     }
+    
+    @Override
+    public List<String> doGenerateBlock(MetaTable.MetaField metaField, int blockNumber, int blockSize) {
+        String mockParams = metaField.getMockParams();
+        List<String> list = new ArrayList<>(blockSize);
+        for (int i = 0; i < blockSize; i++) {
+            FakerType fakerType = Optional.ofNullable(
+                            MockTool.getFakerTypeByValue(mockParams))
+                    .orElse(FakerType.STRING);
+            String randomString = FakerUtils.getRandomValue(fakerType);
+            list.add(randomString);
+        }
+        return list;
+    }
 }

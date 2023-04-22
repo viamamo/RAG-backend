@@ -12,6 +12,7 @@ import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class SqlBuilder {
     /**
      * 方言
      */
-    private SqlDialect sqlDialect;
+    public SqlDialect sqlDialect;
     
     public SqlBuilder() {
         this.sqlDialect = SqlDialectFactory.getDialect(MysqlDialect.class.getName());
@@ -179,6 +180,39 @@ public class SqlBuilder {
             }
         }
         return resultStringBuilder.toString();
+    }
+    
+    public List<String> buildInsertSqlList(MetaTable metaTable, List<Map<String, Object>> dataList) {
+        List<String> sqlList=new ArrayList<>(dataList.size());
+        // 构造模板
+        String template = "insert into %s (%s) values (%s);";
+        // 构造表名
+        String tableName = sqlDialect.wrapTableName(metaTable.getTableName());
+        String dbName = metaTable.getDbName();
+        if (StrUtil.isNotBlank(dbName)) {
+            tableName = String.format("%s.%s", dbName, tableName);
+        }
+        // 构造表字段
+        List<MetaTable.MetaField> metaFieldList = metaTable.getMetaFieldList();
+        // 过滤掉不模拟的字段
+        metaFieldList = metaFieldList.stream()
+                .filter(field -> {
+                    MockType mockType = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
+                            .orElse(MockType.NONE);
+                    return !MockType.NONE.equals(mockType);
+                })
+                .collect(Collectors.toList());
+        for (Map<String, Object> dataRow : dataList) {
+            String keyStr = metaFieldList.stream()
+                    .map(field -> sqlDialect.wrapFieldName(field.getFieldName()))
+                    .collect(Collectors.joining(", "));
+            String valueStr = metaFieldList.stream()
+                    .map(field -> getValueStr(field, dataRow.get(field.getFieldName())))
+                    .collect(Collectors.joining(", "));
+            // 填充模板
+            sqlList.add(String.format(template, tableName, keyStr, valueStr));
+        }
+        return sqlList;
     }
     
     /**

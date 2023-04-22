@@ -23,6 +23,7 @@ public class DataBuilder {
      *
      * @param metaTable
      * @param rowNum
+     *
      * @return
      */
     public List<Map<String, Object>> generateData(MetaTable metaTable, int rowNum) {
@@ -42,6 +43,30 @@ public class DataBuilder {
             // 填充结果列表
             if (CollectionUtils.isNotEmpty(mockDataList)) {
                 for (int i = 0; i < rowNum; i++) {
+                    resultList.get(i).put(fieldName, mockDataList.get(i));
+                }
+            }
+        }
+        return resultList;
+    }
+    
+    public List<Map<String, Object>> generateDataWithBlock(MetaTable metaTable, int blockNumber, int blockSize) {
+        List<MetaTable.MetaField> fieldList = metaTable.getMetaFieldList();
+        // 初始化结果数据
+        List<Map<String, Object>> resultList = new ArrayList<>(blockSize);
+        for (int i = 0; i < blockSize; i++) {
+            resultList.add(new HashMap<>(blockSize));
+        }
+        // 依次生成每一列
+        for (MetaTable.MetaField field : fieldList) {
+            MockType mockTypeEnum = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
+                    .orElse(MockType.NONE);
+            DataGenerator dataGenerator = DataGeneratorFactory.getGenerator(mockTypeEnum);
+            List<String> mockDataList = dataGenerator.doGenerateBlock(field, blockNumber, blockSize);
+            String fieldName = field.getFieldName();
+            // 填充结果列表
+            if (CollectionUtils.isNotEmpty(mockDataList)) {
+                for (int i = 0; i < blockSize; i++) {
                     resultList.get(i).put(fieldName, mockDataList.get(i));
                 }
             }
