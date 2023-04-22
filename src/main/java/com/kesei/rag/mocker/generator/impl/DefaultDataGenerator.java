@@ -49,6 +49,9 @@ public class DefaultDataGenerator implements DataGenerator {
         List<String> list = new ArrayList<>(blockSize);
         // 主键采用递增策略
         if (metaField.isPrimaryKey()) {
+            if (metaField.isAutoIncrement()){
+                return new ArrayList<>();
+            }
             if (StringUtils.isBlank(mockParams)) {
                 mockParams = "1";
             }

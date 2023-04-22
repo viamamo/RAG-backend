@@ -1,5 +1,6 @@
 package com.kesei.rag.service.impl;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
@@ -12,8 +13,11 @@ import com.kesei.rag.mapper.JobInfoMapper;
 import com.kesei.rag.mocker.builder.DataBuilder;
 import com.kesei.rag.mocker.builder.SqlBuilder;
 import com.kesei.rag.mocker.entity.MetaTable;
+import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
+import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
+import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.service.JobInfoService;
 import com.kesei.rag.support.Constants;
 import jakarta.annotation.PostConstruct;
@@ -27,10 +31,12 @@ import javax.sql.DataSource;
 import java.sql.*;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
  * @author kesei
@@ -137,78 +143,165 @@ public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> impl
         Integer finishedNum = jobInfo.getFinishedNum();
         Integer mockNum = jobInfo.getMockNum();
         SqlBuilder sqlBuilder = new SqlBuilder();
-        SqlDialect sqlDialect =sqlBuilder.sqlDialect;
+        SqlDialect sqlDialect = sqlBuilder.sqlDialect;
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
+        String tableName = sqlBuilder.sqlDialect.wrapTableName(metaTable.getTableName());
+        if (StrUtil.isNotBlank(metaTable.getDbName())) {
+            tableName = String.format("%s.%s", metaTable.getDbName(), tableName);
+        }
         
         try {
             connection.createStatement().execute(sqlBuilder.buildCreateTableSql(metaTable));
-            ResultSet resultSet=connection.createStatement().executeQuery("SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='" + jobInfo.getDbName()
-                    + "' AND `TABLE_NAME`='" + jobInfo.getTableName()
-                    + "' AND `COLUMN_NAME`='__rag_data_marker'");
-            if(!resultSet.next()) {
-                connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` ADD COLUMN `__rag_data_marker` bigint DEFAULT " + jobInfo.getId());
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`=? AND `TABLE_NAME`=? AND `COLUMN_NAME`=?");
+            preparedStatement.setString(1, jobInfo.getDbName());
+            preparedStatement.setString(2,jobInfo.getTableName());
+            preparedStatement.setString(3, Constants.DEFAULT_JOB_MARKER_COLUMN);
+            ResultSet resultSet= preparedStatement.executeQuery();
+            if (!resultSet.next()) {
+                connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` ADD COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" bigint");
             }
         } catch (SQLException e) {
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
         }
         
         try {
-            CompletableFuture<Boolean> completableFuture=CompletableFuture.supplyAsync(()->true);
-            Statement statement = connection.createStatement();
-            systemConnection.createStatement().execute("UPDATE job_info SET status=1 WHERE id="+jobInfo.getId());
-            String tableName = sqlBuilder.sqlDialect.wrapTableName(metaTable.getTableName());
-            if (StrUtil.isNotBlank(metaTable.getDbName())) {
-                tableName = String.format("%s.%s", metaTable.getDbName(), tableName);
-            }
-            PreparedStatement insertJob = connection.prepareStatement("INSERT INTO "+tableName+"(?) VALUES ?");
-            PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET finishedNum=? WHERE id="+jobInfo.getId());
-            log.info("start mock");
-            int blockNum=0;
-            int blockSize=mockNum/20;
-            while (finishedNum < mockNum) {
-                blockSize = Math.min(mockNum - finishedNum, blockSize);
-                List<Map<String,Object>> mapList=dataBuilder.generateDataWithBlock(metaTable,blockNum, blockSize);
-                List<String> sqlList = sqlBuilder.buildInsertSqlList(metaTable, mapList);
-                for (String sql : sqlList) {
-                    statement.addBatch(sql);
+            metaTable.setMetaFieldList(metaTable.getMetaFieldList().stream()
+                    .filter(field -> {
+                        MockType mockType = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
+                                .orElse(MockType.NONE);
+                        return !MockType.NONE.equals(mockType);
+                    })
+                    .collect(Collectors.toList()));
+            CompletableFuture<Boolean> completableFuture = CompletableFuture.supplyAsync(() -> true);
+            systemConnection.createStatement().execute("UPDATE job_info SET status=1 WHERE id=" + jobInfo.getId());
+            
+            connection.setAutoCommit(false);
+            PreparedStatement insertJob=connection.prepareStatement("INSERT INTO " + tableName + "() VALUES ()");
+            PreparedStatement insertEmptyJob = connection.prepareStatement("INSERT INTO " + tableName + "("+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+") VALUES ("+jobInfo.getId()+")");
+            PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET finishedNum=? WHERE id=" + jobInfo.getId());
+            
+            int blockNum = 0;
+            int blockSize = Math.min(mockNum/1000,Constants.DEFAULT_BLOCK_SIZE);
+            boolean emptySql = CollectionUtil.isEmpty(dataBuilder.generateData(metaTable, 1));
+            if (emptySql){
+                for (int i = 0; i < blockSize; i++) {
+                    insertEmptyJob.addBatch();
                 }
-                if(completableFuture.get()) {
+            }
+    
+            log.info("start mock");
+            while (finishedNum < mockNum) {
+                if (emptySql) {
+                    insertEmptyJob.executeBatch();
+                    connection.commit();
+                }
+                else {
+                    blockSize = Math.min(mockNum - finishedNum, blockSize);
+                    List<Map<String, Object>> mapList = dataBuilder.generateDataWithBlock(metaTable, blockNum, blockSize);
                     int finalBlockNum = blockNum;
                     int finalBlockSize = blockSize;
-                    completableFuture = CompletableFuture.supplyAsync(() -> {
-                        long start=System.currentTimeMillis();
-                        try {
-                            statement.executeBatch();
-                            statement.clearBatch();
-                        } catch (SQLException e) {
-                            throw new RuntimeException(e);
+                    if (completableFuture.get()) {
+                        insertJob.clearBatch();
+                        StringBuilder fieldListBuilder = new StringBuilder();
+                        StringBuilder valueListBuilder = new StringBuilder();
+                        for (Map<String, Object> map : mapList) {
+                            if (StrUtil.isBlank(fieldListBuilder)) {
+                                for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                    fieldListBuilder.append(",").append(sqlDialect.wrapFieldName(entry.getKey()));
+                                    valueListBuilder.append(",").append("?");
+                                }
+                                insertJob = connection.prepareStatement("INSERT INTO " + tableName + "("+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+fieldListBuilder+") VALUES ("+jobInfo.getId()+valueListBuilder+")");
+                            }
+                            int i=1;
+                            for (Map.Entry<String, Object> entry : map.entrySet()) {
+                                insertJob.setString(i, entry.getValue().toString());
+                                i++;
+                            }
+                            insertJob.addBatch();
                         }
-                        log.info("blockNumber:{},blockSize:{},time:{}s", finalBlockNum, finalBlockSize,(double)(System.currentTimeMillis()-start)/1000);
-                        return true;
-                    });
+    
+                        PreparedStatement finalInsertJob = insertJob;
+                        completableFuture = CompletableFuture.supplyAsync(() -> {
+                            long start = System.currentTimeMillis();
+                            try {
+                                finalInsertJob.executeBatch();
+                                connection.commit();
+                            } catch (SQLException e) {
+                                throw new RuntimeException(e);
+                            }
+                            log.info("blockNumber:{},blockSize:{},time:{}s", finalBlockNum, finalBlockSize, (double) (System.currentTimeMillis() - start) / 1000);
+                            return true;
+                        });
+                    }
                 }
-                updateJob.setInt(1, finishedNum);
-                updateJob.execute();
                 blockNum++;
                 finishedNum += blockSize;
+                updateJob.setInt(1, finishedNum);
+                updateJob.execute();
                 log.info("finishedNum:{}", finishedNum);
             }
         } catch (Exception e) {
             try {
+                log.error("{}",e.getMessage());
                 PreparedStatement exception = systemConnection.prepareStatement("UPDATE job_info SET status=4,exception=? WHERE id=?");
                 exception.setString(1, e.getMessage());
                 exception.setLong(2, jobInfo.getId());
                 exception.execute();
             } catch (SQLException ex) {
-                throw new RuntimeException(ex);
+                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
             }
         }
         try {
+            PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=2 WHERE id=" + jobInfo.getId());
+            updateJob.execute();
             systemConnection.close();
             connection.close();
-        }catch (SQLException e){
-            log.error("jobId:{},connection close failed\nexception message:{}",jobInfo.getId(), e.getMessage());
+        } catch (SQLException e) {
+            log.error("jobId:{},connection close failed\nexception message:{}", jobInfo.getId(), e.getMessage());
         }
         log.info("finished");
+    }
+    
+    @Override
+    public boolean rollbackJob(JobInfo jobInfo, Connection systemConnection, Connection connection) {
+        log.info("start rollback,jobId:{}",jobInfo.getId());
+        try {
+            PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=1 WHERE id=" + jobInfo.getId());
+            updateJob.execute();
+        } catch (SQLException e) {
+            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
+        }
+        SqlDialect sqlDialect=new SqlBuilder().sqlDialect;
+        MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
+        String tableName = sqlDialect.wrapTableName(metaTable.getTableName());
+        if (StrUtil.isNotBlank(metaTable.getDbName())) {
+            tableName = String.format("%s.%s", metaTable.getDbName(), tableName);
+        }
+        try {
+            PreparedStatement preparedStatement=connection.prepareStatement("DELETE FROM "+tableName+"WHERE "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+"=?");
+            preparedStatement.setLong(1,jobInfo.getId());
+            preparedStatement.execute();
+    
+            preparedStatement=connection.prepareStatement("SELECT count(1) as totalCount FROM "+tableName+" WHERE "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" IS NOT NULL");
+            ResultSet resultSet=preparedStatement.executeQuery();
+            int totalCount=0;
+            if(resultSet.next())
+                totalCount=resultSet.getInt("totalCount");
+            if (totalCount==0) {
+                connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` DROP COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN));
+            }
+            PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=3 WHERE id=" + jobInfo.getId());
+            updateJob.execute();
+        } catch (SQLException e) {
+            try {
+                PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=2 WHERE id=" + jobInfo.getId());
+                updateJob.execute();
+            } catch (SQLException ex) {
+                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
+            }
+            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
+        }
+        log.info("finish rollback,jobId:{}",jobInfo.getId());
+        return true;
     }
 }

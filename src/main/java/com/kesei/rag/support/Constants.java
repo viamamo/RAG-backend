@@ -91,4 +91,10 @@ public class Constants {
     // database
     
     public static final Integer MAX_ACTIVE_CONNECTION=20;
+    
+    // job
+    
+    public static final Integer DEFAULT_BLOCK_SIZE=10000;
+    
+    public static final String DEFAULT_JOB_MARKER_COLUMN="__rag_data_marker";
 }

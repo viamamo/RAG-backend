@@ -98,7 +98,14 @@ public class JobInfoController {
     
     @RequestMapping("/rollback")
     public GenericResponse<Boolean> rollbackJob(@RequestBody JobInfoPostRequest jobInfoPostRequest){
-        return ResponseUtils.success(true);
+        JobInfo jobInfo=jobInfoService.getById(jobInfoPostRequest.getId());
+        Connection connection= jobInfoService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
+        try {
+            Connection systemConnection = jobInfoService.getSystemConnection();
+            return ResponseUtils.success(jobInfoService.rollbackJob(jobInfo,systemConnection, connection));
+        } catch (SQLException e) {
+            return ResponseUtils.error(ResponseCode.SYSTEM_ERROR,"获取系统线程失败");
+        }
     }
     
     @RequestMapping("/execute/simple")

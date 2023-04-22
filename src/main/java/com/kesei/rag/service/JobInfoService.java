@@ -38,4 +38,6 @@ public interface JobInfoService extends IService<JobInfo> {
      * @param connection
      */
     void executeJob(JobInfo jobInfo,Connection systemConnection,Connection connection);
+    
+    boolean rollbackJob(JobInfo jobInfo,Connection systemConnection,Connection connection);
 }
