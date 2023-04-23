@@ -2,8 +2,8 @@ package com.kesei.rag.aop;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.kesei.rag.entity.po.UserInfo;
-import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.exception.GenericException;
+import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.service.UserInfoService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;

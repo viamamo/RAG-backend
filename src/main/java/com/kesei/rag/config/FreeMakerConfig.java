@@ -4,7 +4,6 @@ import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.springframework.context.annotation.Bean;
 
-
 import java.io.File;
 import java.io.IOException;
 

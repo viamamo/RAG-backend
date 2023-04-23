@@ -1,7 +1,7 @@
 package com.kesei.rag.mocker.support.dialect;
 
-import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.exception.GenericException;
+import com.kesei.rag.mocker.support.ResponseCode;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

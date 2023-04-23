@@ -1,14 +1,14 @@
 package com.kesei.rag.mocker.builder;
 
 import cn.hutool.core.util.StrUtil;
-import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.MockType;
+import com.kesei.rag.mocker.support.ResponseCode;
+import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import com.kesei.rag.mocker.support.dialect.SqlDialectFactory;
 import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
-import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import lombok.extern.slf4j.Slf4j;
 

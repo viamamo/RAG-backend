@@ -16,7 +16,6 @@ import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
-import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.service.JobInfoService;
 import com.kesei.rag.support.Constants;
@@ -35,7 +34,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 /**
@@ -140,7 +138,8 @@ public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> impl
     @Async
     public void executeJob(JobInfo jobInfo, Connection systemConnection, Connection connection) {
         log.info("start execute");
-        Integer finishedNum = jobInfo.getFinishedNum();
+        Integer finishedNumSum=jobInfo.getFinishedNum();
+        int finishedNum = 0;
         Integer mockNum = jobInfo.getMockNum();
         SqlBuilder sqlBuilder = new SqlBuilder();
         SqlDialect sqlDialect = sqlBuilder.sqlDialect;
@@ -236,9 +235,10 @@ public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> impl
                 }
                 blockNum++;
                 finishedNum += blockSize;
-                updateJob.setInt(1, finishedNum);
+                finishedNumSum+=blockSize;
+                updateJob.setInt(1, finishedNumSum);
                 updateJob.execute();
-                log.info("finishedNum:{}", finishedNum);
+                log.info("finishedNum:{},finishedNumSum:{}", finishedNum,finishedNumSum);
             }
         } catch (Exception e) {
             try {

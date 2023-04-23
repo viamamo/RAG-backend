@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kesei.rag.entity.po.DbInfo;
 import com.kesei.rag.entity.po.JobInfo;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
 

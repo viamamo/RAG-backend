@@ -7,8 +7,6 @@ import com.kesei.rag.mocker.builder.*;
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.exception.MetaTableException;
 import com.kesei.rag.support.Constants;
-import com.kesei.rag.support.utils.SpringContextUtils;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

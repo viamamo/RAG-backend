@@ -1,7 +1,6 @@
 package com.kesei.rag.controller;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kesei.rag.entity.dto.GenericResponse;
@@ -13,7 +12,6 @@ import com.kesei.rag.entity.po.DbInfo;
 import com.kesei.rag.entity.po.JobInfo;
 import com.kesei.rag.entity.po.UserInfo;
 import com.kesei.rag.exception.GenericException;
-import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.service.DbInfoService;
 import com.kesei.rag.service.JobInfoService;
@@ -23,7 +21,6 @@ import com.kesei.rag.support.utils.ResponseUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import net.datafaker.providers.base.Job;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
