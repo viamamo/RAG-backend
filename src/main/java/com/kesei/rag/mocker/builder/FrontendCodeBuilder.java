@@ -13,6 +13,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -26,12 +27,15 @@ import java.util.Optional;
 @Slf4j
 public class FrontendCodeBuilder {
     
-    private static Configuration configuration;
-    
     @Resource
-    public void setConfiguration(Configuration configuration) {
-        FrontendCodeBuilder.configuration = configuration;
-    }
+    FreeMarkerConfigurer freeMarkerConfigurer;
+    
+    // private static Configuration configuration;
+    //
+    // @Resource
+    // public void setConfiguration(Configuration configuration) {
+    //     FrontendCodeBuilder.configuration = configuration;
+    // }
     
     /**
      * 构造 Typescript 类型代码
@@ -64,7 +68,7 @@ public class FrontendCodeBuilder {
         typescriptEntityMetaData.setMetaFieldList(tsMetaFieldList);
     
         StringWriter stringWriter=new StringWriter();
-        Template template=configuration.getTemplate(Constants.FRONT_CODE_TEMPLATE);
+        Template template=freeMarkerConfigurer.getConfiguration().getTemplate(Constants.FRONT_CODE_TEMPLATE);
         template.process(typescriptEntityMetaData, stringWriter);
         return stringWriter.toString();
     }

@@ -5,11 +5,11 @@ import com.kesei.rag.entity.dto.GenericPostRequest;
 import com.kesei.rag.entity.dto.GenericResponse;
 import com.kesei.rag.entity.vo.GenerationVO;
 import com.kesei.rag.exception.GenericException;
-import com.kesei.rag.mocker.GeneratorFacade;
 import com.kesei.rag.mocker.entity.MetaTable;
-import com.kesei.rag.mocker.entity.MetaTableBuilder;
 import com.kesei.rag.mocker.support.ResponseCode;
+import com.kesei.rag.service.SqlService;
 import com.kesei.rag.support.utils.ResponseUtils;
+import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,9 +34,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public class SqlController {
     
+    @Resource
+    SqlService sqlService;
+    
     @PostMapping("/generate/schema")
     public GenericResponse<GenerationVO> generateBySchema(@RequestBody MetaTable metaTable) {
-        return ResponseUtils.success(GeneratorFacade.generateAll(metaTable));
+        return ResponseUtils.success(sqlService.generateBySchema(metaTable));
     }
     
     @PostMapping("/get/schema/auto")
@@ -44,7 +47,7 @@ public class SqlController {
         if (autoPostRequest == null) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
-        return ResponseUtils.success(MetaTableBuilder.buildFromAuto(autoPostRequest.getContent()));
+        return ResponseUtils.success(sqlService.getSchemaByAuto(autoPostRequest.getContent()));
     }
     
     /**
@@ -59,12 +62,12 @@ public class SqlController {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
         // 获取 tableSchema
-        return ResponseUtils.success(MetaTableBuilder.buildFromSql(sqlPostRequest.getContent()));
+        return ResponseUtils.success(sqlService.getSchemaBySql(sqlPostRequest.getContent()));
     }
     
     @PostMapping("/get/schema/excel")
     public GenericResponse<MetaTable> getSchemaByExcel(MultipartFile file) {
-        return ResponseUtils.success(MetaTableBuilder.buildFromExcel(file));
+        return ResponseUtils.success(sqlService.getSchemaByExcel(file));
     }
     
     /**

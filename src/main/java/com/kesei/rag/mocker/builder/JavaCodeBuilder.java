@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -33,12 +34,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class JavaCodeBuilder {
     
-    private static Configuration configuration;
-    
     @Resource
-    public void setConfiguration(Configuration configuration) {
-        JavaCodeBuilder.configuration = configuration;
-    }
+    FreeMarkerConfigurer freeMarkerConfigurer;
+    // private static Configuration configuration;
+    //
+    // @Resource
+    // public void setConfiguration(Configuration configuration) {
+    //     JavaCodeBuilder.configuration = configuration;
+    // }
     
     /**
      * 构造 Java 实体代码
@@ -70,7 +73,7 @@ public class JavaCodeBuilder {
         javaEntityMetaData.setMetaFieldList(javaEntityMetaFieldList);
         
         StringWriter stringWriter = new StringWriter();
-        Template temp = configuration.getTemplate(Constants.JAVA_ENTITY_TEMPLATE);
+        Template temp = freeMarkerConfigurer.getConfiguration().getTemplate(Constants.JAVA_ENTITY_TEMPLATE);
         temp.process(javaEntityMetaData, stringWriter);
         return stringWriter.toString();
     }
@@ -117,7 +120,7 @@ public class JavaCodeBuilder {
         javaObjectMetaData.setMetaFieldList(javaObjectMetaFieldList);
     
         StringWriter stringWriter = new StringWriter();
-        Template temp = configuration.getTemplate(Constants.JAVA_OBJECT_TEMPLATE);
+        Template temp = freeMarkerConfigurer.getConfiguration().getTemplate(Constants.JAVA_OBJECT_TEMPLATE);
         temp.process(javaObjectMetaData, stringWriter);
         return stringWriter.toString();
     }
