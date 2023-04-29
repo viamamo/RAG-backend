@@ -3,6 +3,7 @@ package com.kesei.rag.mocker.builder;
 import cn.hutool.core.util.StrUtil;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
+import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
@@ -29,7 +30,7 @@ public class SqlBuilder {
     public SqlDialect sqlDialect;
     
     public SqlBuilder() {
-        this.sqlDialect = SqlDialectFactory.getDialect(MysqlDialect.class.getName());
+        this.sqlDialect = SqlDialectFactory.getDialect(DatabaseType.MYSQL,MysqlDialect.class.getName());
     }
     
     public SqlBuilder(SqlDialect sqlDialect) {

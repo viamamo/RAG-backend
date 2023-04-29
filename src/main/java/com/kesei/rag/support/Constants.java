@@ -39,6 +39,7 @@ public class Constants {
     
     // dialect
     
+    public static final String SQL_DIALECT_PACKAGE="com.kesei.rag.mocker.support.dialect.impl";
     public static final String MYSQL_ESCAPE_CHARACTER="`";
     
     // role
@@ -97,4 +98,5 @@ public class Constants {
     public static final Integer DEFAULT_BLOCK_SIZE=10000;
     
     public static final String DEFAULT_JOB_MARKER_COLUMN="__rag_data_marker";
+    
 }

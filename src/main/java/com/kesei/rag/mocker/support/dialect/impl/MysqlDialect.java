@@ -1,11 +1,14 @@
 package com.kesei.rag.mocker.support.dialect.impl;
 
+import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
+import com.kesei.rag.mocker.support.dialect.SqlDialectAnnotation;
 import com.kesei.rag.support.Constants;
 
 /**
  * @author kesei
  */
+@SqlDialectAnnotation(databaseType = DatabaseType.MYSQL)
 public class MysqlDialect implements SqlDialect {
     
     /**
