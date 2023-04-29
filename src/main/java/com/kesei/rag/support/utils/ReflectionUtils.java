@@ -16,9 +16,9 @@ import java.util.ArrayList;
  */
 @Slf4j
 public class ReflectionUtils {
-    public static PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
+    public static final PathMatchingResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
     
-    public static MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
+    public static final MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
     
     public static ArrayList<Class<?>> getResourcesByPackage(String packageName){
         String resourcePattern = "/**/*.class";

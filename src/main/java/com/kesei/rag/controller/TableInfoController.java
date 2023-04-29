@@ -44,9 +44,6 @@ public class TableInfoController {
     @Resource
     private UserInfoService userInfoService;
     
-    
-    // region 增删改查
-    
     /**
      * 创建
      *
@@ -99,32 +96,6 @@ public class TableInfoController {
         }
         boolean b = tableInfoService.removeById(id);
         return ResponseUtils.success(b);
-    }
-    
-    /**
-     * 更新（仅管理员）
-     *
-     * @param tableInfoPostRequest
-     * @return
-     */
-    @PostMapping("/update")
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
-    public GenericResponse<Boolean> updateTableInfo(@RequestBody TableInfoPostRequest tableInfoPostRequest) {
-        if (tableInfoPostRequest == null || tableInfoPostRequest.getId() <= 0) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        TableInfo tableInfo = new TableInfo();
-        BeanUtils.copyProperties(tableInfoPostRequest, tableInfo);
-        // 参数校验
-        tableInfoService.valid(tableInfo, false);
-        long id = tableInfoPostRequest.getId();
-        // 判断是否存在
-        TableInfo oldTableInfo = tableInfoService.getById(id);
-        if (oldTableInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        boolean result = tableInfoService.updateById(tableInfo);
-        return ResponseUtils.success(result);
     }
     
     /**
@@ -223,48 +194,6 @@ public class TableInfoController {
         queryWrapper.eq("userId", currentUser.getId());
         Page<TableInfo> tableInfoPage = tableInfoService.page(new Page<>(pageNum, pageSize), queryWrapper);
         return ResponseUtils.success(tableInfoPage);
-    }
-    
-    /**
-     * 分页获取当前用户创建的资源列表
-     *
-     * @param tableInfoGetRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/my/add/list/page")
-    public GenericResponse<Page<TableInfo>> listMyAddTableInfoByPage(TableInfoGetRequest tableInfoGetRequest,
-                                                                  HttpServletRequest request) {
-        if (tableInfoGetRequest == null) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        UserInfo currentUser = userInfoService.getCurrentUser(request);
-        tableInfoGetRequest.setUserId(currentUser.getId());
-        long pageNum = tableInfoGetRequest.getPaginationNum();
-        long pageSize = tableInfoGetRequest.getPaginationSize();
-        Page<TableInfo> tableInfoPage = tableInfoService.page(new Page<>(pageNum, pageSize),
-                getQueryWrapper(tableInfoGetRequest));
-        return ResponseUtils.success(tableInfoPage);
-    }
-    
-    /**
-     * 生成创建表的 SQL
-     *
-     * @param id
-     * @return
-     */
-    @PostMapping("/generate/sql")
-    public GenericResponse<String> generateCreateSql(@RequestBody long id) {
-        if (id <= 0) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        TableInfo tableInfo = tableInfoService.getById(id);
-        if (tableInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        MetaTable metaTable = JSONUtil.toBean(tableInfo.getContent(), MetaTable.class);
-        SqlBuilder sqlBuilder = new SqlBuilder();
-        return ResponseUtils.success(sqlBuilder.buildCreateTableSql(metaTable));
     }
     
     /**

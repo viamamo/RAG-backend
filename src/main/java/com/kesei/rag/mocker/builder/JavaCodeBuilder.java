@@ -10,7 +10,6 @@ import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.support.Constants;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;

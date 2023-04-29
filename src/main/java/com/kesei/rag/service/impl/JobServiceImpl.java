@@ -13,11 +13,13 @@ import com.kesei.rag.mapper.JobInfoMapper;
 import com.kesei.rag.mocker.builder.DataBuilder;
 import com.kesei.rag.mocker.builder.SqlBuilder;
 import com.kesei.rag.mocker.entity.MetaTable;
+import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
+import com.kesei.rag.mocker.support.dialect.SqlDialectFactory;
 import com.kesei.rag.mocker.support.utils.MockTool;
-import com.kesei.rag.service.JobInfoService;
+import com.kesei.rag.service.JobService;
 import com.kesei.rag.support.Constants;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
@@ -41,7 +43,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
-public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implements JobInfoService {
+public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implements JobService {
     
     @Resource
     private Environment config;
@@ -141,8 +143,9 @@ public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> impl
         Integer finishedNumSum=jobInfo.getFinishedNum();
         int finishedNum = 0;
         Integer mockNum = jobInfo.getMockNum();
-        SqlBuilder sqlBuilder = new SqlBuilder();
-        SqlDialect sqlDialect = sqlBuilder.sqlDialect;
+        DatabaseType databaseType=MockTool.getDatabaseTypeByName(jobInfo.getDbType());
+        SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType,null);
+        SqlBuilder sqlBuilder = new SqlBuilder(sqlDialect);
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
         String tableName = sqlBuilder.sqlDialect.wrapTableName(metaTable.getTableName());
         if (StrUtil.isNotBlank(metaTable.getDbName())) {
@@ -151,10 +154,7 @@ public class JobInfoServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> impl
         
         try {
             connection.createStatement().execute(sqlBuilder.buildCreateTableSql(metaTable));
-            PreparedStatement preparedStatement = connection.prepareStatement("SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`=? AND `TABLE_NAME`=? AND `COLUMN_NAME`=?");
-            preparedStatement.setString(1, jobInfo.getDbName());
-            preparedStatement.setString(2,jobInfo.getTableName());
-            preparedStatement.setString(3, Constants.DEFAULT_JOB_MARKER_COLUMN);
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlDialect.getColumnIsExistSql(jobInfo.getDbName(), jobInfo.getTableName(), Constants.DEFAULT_JOB_MARKER_COLUMN));
             ResultSet resultSet= preparedStatement.executeQuery();
             if (!resultSet.next()) {
                 connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` ADD COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" bigint");

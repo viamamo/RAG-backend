@@ -32,4 +32,13 @@ public interface SqlDialect {
      * @return
      */
     String parseTableName(String tableName);
+    
+    /**
+     * 获取判断列是否存在的SQL
+     *
+     * @param dbName
+     * @param tableName
+     * @param columnName
+     */
+    String getColumnIsExistSql(String dbName, String tableName, String columnName);
 }

@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class SqlController {
     
     @Resource
-    SqlService sqlService;
+    private SqlService sqlService;
     
     @PostMapping("/generate/schema")
     public GenericResponse<GenerationVO> generateBySchema(@RequestBody MetaTable metaTable) {

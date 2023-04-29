@@ -51,9 +51,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             if (count > 0) {
                 throw new GenericException(ResponseCode.PARAMS_ERROR, "账号重复");
             }
-            // 2. 加密
+            // 加密
             String encryptPassword = SecureUtil.sha256((Constants.SALT + userPassword));
-            // 3. 插入数据
+            // 插入数据
             UserInfo userInfo = new UserInfo();
             userInfo.setUserName(userName);
             userInfo.setUserAccount(userAccount);

@@ -3,11 +3,6 @@ package com.kesei.rag.config;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateExceptionHandler;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-
-import java.io.File;
-import java.io.IOException;
 
 /**
  * @author kesei

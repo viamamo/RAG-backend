@@ -6,7 +6,6 @@ import com.kesei.rag.mocker.entity.metadata.TypescriptEntityMetaData;
 import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.support.Constants;
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import jakarta.annotation.Resource;
 import lombok.SneakyThrows;

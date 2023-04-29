@@ -1,6 +1,5 @@
 package com.kesei.rag.service.impl;
 
-import com.kesei.rag.entity.dto.GenericPostRequest;
 import com.kesei.rag.entity.vo.GenerationVO;
 import com.kesei.rag.mocker.GeneratorFacade;
 import com.kesei.rag.mocker.entity.MetaTable;

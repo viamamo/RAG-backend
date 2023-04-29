@@ -1,6 +1,5 @@
 package com.kesei.rag.service;
 
-import com.kesei.rag.entity.dto.GenericPostRequest;
 import com.kesei.rag.entity.vo.GenerationVO;
 import com.kesei.rag.mocker.entity.MetaTable;
 import org.springframework.web.multipart.MultipartFile;

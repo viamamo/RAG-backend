@@ -99,32 +99,6 @@ public class FieldInfoController {
     }
     
     /**
-     * 更新（仅管理员）
-     *
-     * @param fieldInfoPostRequest
-     * @return
-     */
-    @PostMapping("/update")
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
-    public GenericResponse<Boolean> updateFieldInfo(@RequestBody FieldInfoPostRequest fieldInfoPostRequest) {
-        if (fieldInfoPostRequest == null || fieldInfoPostRequest.getId() <= 0) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        FieldInfo fieldInfo = new FieldInfo();
-        BeanUtils.copyProperties(fieldInfoPostRequest, fieldInfo);
-        // 参数校验
-        fieldInfoService.valid(fieldInfo, false);
-        long id = fieldInfoPostRequest.getId();
-        // 判断是否存在
-        FieldInfo oldFieldInfo = fieldInfoService.getById(id);
-        if (oldFieldInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        boolean result = fieldInfoService.updateById(fieldInfo);
-        return ResponseUtils.success(result);
-    }
-    
-    /**
      * 根据 id 获取
      *
      * @param id
@@ -223,48 +197,6 @@ public class FieldInfoController {
     }
     
     /**
-     * 分页获取当前用户创建的资源列表
-     *
-     * @param fieldInfoGetRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/my/add/list/page")
-    public GenericResponse<Page<FieldInfo>> listMyAddFieldInfoByPage(FieldInfoGetRequest fieldInfoGetRequest,
-                                                                  HttpServletRequest request) {
-        if (fieldInfoGetRequest == null) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        UserInfo currentUser = userInfoService.getCurrentUser(request);
-        fieldInfoGetRequest.setUserId(currentUser.getId());
-        long pageNum = fieldInfoGetRequest.getPaginationNum();
-        long pageSize = fieldInfoGetRequest.getPaginationSize();
-        Page<FieldInfo> fieldInfoPage = fieldInfoService.page(new Page<>(pageNum, pageSize),
-                getQueryWrapper(fieldInfoGetRequest));
-        return ResponseUtils.success(fieldInfoPage);
-    }
-    
-    /**
-     * 生成创建字段的 SQL
-     *
-     * @param id
-     * @return
-     */
-    @PostMapping("/generate/sql")
-    public GenericResponse<String> generateCreateSql(@RequestBody long id) {
-        if (id <= 0) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        FieldInfo fieldInfo = fieldInfoService.getById(id);
-        if (fieldInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        MetaTable.MetaField metaField = JSONUtil.toBean(fieldInfo.getContent(),MetaTable.MetaField.class);
-        SqlBuilder sqlBuilder = new SqlBuilder();
-        return ResponseUtils.success(sqlBuilder.buildCreateFieldSql(metaField));
-    }
-    
-    /**
      * 获取查询包装类
      *
      * @param fieldInfoGetRequest
@@ -276,7 +208,6 @@ public class FieldInfoController {
         }
         FieldInfo fieldInfoQuery = new FieldInfo();
         BeanUtils.copyProperties(fieldInfoGetRequest, fieldInfoQuery);
-        String searchName = fieldInfoGetRequest.getSearchName();
         String sortColumn = fieldInfoGetRequest.getSortColumn();
         String sortOrder = fieldInfoGetRequest.getSortOrder();
         String searchParam = fieldInfoGetRequest.getSearchParam();

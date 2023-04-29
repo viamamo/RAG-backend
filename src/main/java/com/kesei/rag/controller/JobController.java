@@ -14,7 +14,7 @@ import com.kesei.rag.entity.po.UserInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.service.DbInfoService;
-import com.kesei.rag.service.JobInfoService;
+import com.kesei.rag.service.JobService;
 import com.kesei.rag.service.UserInfoService;
 import com.kesei.rag.support.Constants;
 import com.kesei.rag.support.utils.ResponseUtils;
@@ -31,16 +31,16 @@ import java.sql.SQLException;
  * @author kesei
  */
 @RestController
-@RequestMapping("job_info")
+@RequestMapping("job")
 @Slf4j
-public class JobInfoController {
+public class JobController {
     
     @Resource
     UserInfoService userInfoService;
     @Resource
     DbInfoService dbInfoService;
     @Resource
-    JobInfoService jobInfoService;
+    JobService jobService;
     
     @RequestMapping("/add")
     public GenericResponse<Long> addJob(@RequestBody AddJobRequest addJobRequest, HttpServletRequest request){
@@ -49,8 +49,8 @@ public class JobInfoController {
         DbInfo dbInfo=dbInfoService.getById(addJobRequest.getDbInfoId());
         
         jobInfo.setUserId(currentUser.getId());
-        jobInfoService.handleAdd(jobInfo, addJobRequest.getContent(), dbInfo);
-        boolean result = jobInfoService.save(jobInfo);
+        jobService.handleAdd(jobInfo, addJobRequest.getContent(), dbInfo);
+        boolean result = jobService.save(jobInfo);
         if (!result) {
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
         }
@@ -64,29 +64,29 @@ public class JobInfoController {
         }
         long id = jobInfoPostRequest.getId();
         // 判断是否存在
-        JobInfo oldJobInfo = jobInfoService.getById(id);
+        JobInfo oldJobInfo = jobService.getById(id);
         if (oldJobInfo == null) {
             throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
         }
-        return ResponseUtils.success(jobInfoService.removeById(id));
+        return ResponseUtils.success(jobService.removeById(id));
     }
     
     @GetMapping("/list/page")
     public GenericResponse<Page<JobInfo>> listDbInfoByPage(JobInfoGetRequest jobInfoGetRequest) {
         long pageNum = jobInfoGetRequest.getPaginationNum();
         long pageSize = jobInfoGetRequest.getPaginationSize();
-        Page<JobInfo> jobInfoPage = jobInfoService.page(new Page<>(pageNum, pageSize),
+        Page<JobInfo> jobInfoPage = jobService.page(new Page<>(pageNum, pageSize),
                 getQueryWrapper(jobInfoGetRequest));
         return ResponseUtils.success(jobInfoPage);
     }
     
     @RequestMapping("/execute")
     public GenericResponse<Boolean> executeJob(@RequestBody JobInfoPostRequest jobInfoPostRequest) {
-        JobInfo jobInfo=jobInfoService.getById(jobInfoPostRequest.getId());
-        Connection connection= jobInfoService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
+        JobInfo jobInfo= jobService.getById(jobInfoPostRequest.getId());
+        Connection connection= jobService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
         try {
-            Connection systemConnection = jobInfoService.getSystemConnection();
-            jobInfoService.executeJob(jobInfo,systemConnection, connection);
+            Connection systemConnection = jobService.getSystemConnection();
+            jobService.executeJob(jobInfo,systemConnection, connection);
         } catch (SQLException e) {
             return ResponseUtils.error(ResponseCode.SYSTEM_ERROR,"获取系统线程失败");
         }
@@ -95,11 +95,11 @@ public class JobInfoController {
     
     @RequestMapping("/rollback")
     public GenericResponse<Boolean> rollbackJob(@RequestBody JobInfoPostRequest jobInfoPostRequest){
-        JobInfo jobInfo=jobInfoService.getById(jobInfoPostRequest.getId());
-        Connection connection= jobInfoService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
+        JobInfo jobInfo= jobService.getById(jobInfoPostRequest.getId());
+        Connection connection= jobService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
         try {
-            Connection systemConnection = jobInfoService.getSystemConnection();
-            return ResponseUtils.success(jobInfoService.rollbackJob(jobInfo,systemConnection, connection));
+            Connection systemConnection = jobService.getSystemConnection();
+            return ResponseUtils.success(jobService.rollbackJob(jobInfo,systemConnection, connection));
         } catch (SQLException e) {
             return ResponseUtils.error(ResponseCode.SYSTEM_ERROR,"获取系统线程失败");
         }
@@ -108,10 +108,10 @@ public class JobInfoController {
     @RequestMapping("/execute/simple")
     public GenericResponse<Boolean> executeSqlSimple(@RequestBody SimpleExecutionRequest simpleExecutionRequest){
         DbInfo dbInfo=dbInfoService.getById(simpleExecutionRequest.getDbInfoId());
-        Connection connection= jobInfoService.getConnection(dbInfo);
+        Connection connection= jobService.getConnection(dbInfo);
         return ResponseUtils.success(
                 StrUtil.isNotBlank(simpleExecutionRequest.getSql())
-                        ?jobInfoService.executeSimpleSql(connection, simpleExecutionRequest.getSql())
+                        ? jobService.executeSimpleSql(connection, simpleExecutionRequest.getSql())
                         :true
         );
     }

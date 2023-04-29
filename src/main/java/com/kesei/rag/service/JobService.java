@@ -10,7 +10,7 @@ import java.sql.SQLException;
 /**
  * @author kesei
  */
-public interface JobInfoService extends IService<JobInfo> {
+public interface JobService extends IService<JobInfo> {
     
     Connection getSystemConnection() throws SQLException;
     Connection getConnection(DbInfo dbInfo);

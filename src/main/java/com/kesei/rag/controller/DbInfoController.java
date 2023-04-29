@@ -3,7 +3,6 @@ package com.kesei.rag.controller;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.kesei.rag.aop.AuthCheck;
 import com.kesei.rag.entity.dto.GenericResponse;
 import com.kesei.rag.entity.dto.db.DbInfoGetRequest;
 import com.kesei.rag.entity.dto.db.DbInfoPostRequest;
@@ -63,12 +62,10 @@ public class DbInfoController{
      * 删除
      *
      * @param dbInfoPostRequest
-     * @param request
      * @return
      */
     @PostMapping("/delete")
-    public GenericResponse<Boolean> deleteDbInfo(@RequestBody DbInfoPostRequest dbInfoPostRequest,
-                                                    HttpServletRequest request) {
+    public GenericResponse<Boolean> deleteDbInfo(@RequestBody DbInfoPostRequest dbInfoPostRequest) {
         if (dbInfoPostRequest == null || dbInfoPostRequest.getId() <= 0) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
@@ -80,32 +77,6 @@ public class DbInfoController{
         }
         boolean b = dbInfoService.removeById(id);
         return ResponseUtils.success(b);
-    }
-    
-    /**
-     * 更新（仅管理员）
-     *
-     * @param dbInfoPostRequest
-     * @return
-     */
-    @PostMapping("/update")
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
-    public GenericResponse<Boolean> updateDbInfo(@RequestBody DbInfoPostRequest dbInfoPostRequest) {
-        if (dbInfoPostRequest == null || dbInfoPostRequest.getId() <= 0) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        DbInfo dbInfo = new DbInfo();
-        BeanUtils.copyProperties(dbInfoPostRequest, dbInfo);
-        // 参数校验
-        dbInfoService.valid(dbInfo, false);
-        long id = dbInfoPostRequest.getId();
-        // 判断是否存在
-        DbInfo oldDbInfo = dbInfoService.getById(id);
-        if (oldDbInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR);
-        }
-        boolean result = dbInfoService.updateById(dbInfo);
-        return ResponseUtils.success(result);
     }
     
     /**
@@ -139,12 +110,10 @@ public class DbInfoController{
      * 分页获取列表
      *
      * @param dbInfoGetRequest
-     * @param request
      * @return
      */
     @GetMapping("/list/page")
-    public GenericResponse<Page<DbInfo>> listDbInfoByPage(DbInfoGetRequest dbInfoGetRequest,
-                                                                HttpServletRequest request) {
+    public GenericResponse<Page<DbInfo>> listDbInfoByPage(DbInfoGetRequest dbInfoGetRequest) {
         long pageNum = dbInfoGetRequest.getPaginationNum();
         long pageSize = dbInfoGetRequest.getPaginationSize();
         Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize),
@@ -202,28 +171,6 @@ public class DbInfoController{
         QueryWrapper<DbInfo> queryWrapper = getQueryWrapper(dbInfoGetRequest);
         queryWrapper.eq("userId", currentUser.getId());
         Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize), queryWrapper);
-        return ResponseUtils.success(dbInfoPage);
-    }
-    
-    /**
-     * 分页获取当前用户创建的资源列表
-     *
-     * @param dbInfoGetRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/my/add/list/page")
-    public GenericResponse<Page<DbInfo>> listMyAddDbInfoByPage(DbInfoGetRequest dbInfoGetRequest,
-                                                                     HttpServletRequest request) {
-        if (dbInfoGetRequest == null) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        UserInfo currentUser = userInfoService.getCurrentUser(request);
-        dbInfoGetRequest.setUserId(currentUser.getId());
-        long pageNum = dbInfoGetRequest.getPaginationNum();
-        long pageSize = dbInfoGetRequest.getPaginationSize();
-        Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize),
-                getQueryWrapper(dbInfoGetRequest));
         return ResponseUtils.success(dbInfoPage);
     }
     
