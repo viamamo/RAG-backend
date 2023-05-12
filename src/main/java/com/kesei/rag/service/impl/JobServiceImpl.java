@@ -10,6 +10,7 @@ import com.kesei.rag.entity.po.DbInfo;
 import com.kesei.rag.entity.po.JobInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mapper.JobInfoMapper;
+import com.kesei.rag.mocker.GeneratorFacade;
 import com.kesei.rag.mocker.builder.DataBuilder;
 import com.kesei.rag.mocker.builder.SqlBuilder;
 import com.kesei.rag.mocker.entity.MetaTable;
@@ -68,6 +69,10 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
     @Override
     public void handleAdd(JobInfo jobInfo, String metaTableString, DbInfo dbInfo) {
         MetaTable metaTable = JSONUtil.toBean(metaTableString, MetaTable.class);
+        GeneratorFacade.validMetaTableJob(metaTable);
+        for(MetaTable.MetaField metaField:metaTable.getMetaFieldList()){
+            GeneratorFacade.validMetaField(metaField);
+        }
         jobInfo.setDbId(dbInfo.getId());
         jobInfo.setFinishedNum(0);
         jobInfo.setMockNum(metaTable.getMockNum());
@@ -95,7 +100,9 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
                 if (StrUtil.isNotBlank(dbInfo.getDriver())) {
                     properties.setProperty("driver", dbInfo.getDriver());
                 }
-                return DruidDataSourceFactory.createDataSource(properties);
+                DataSource dataSource=DruidDataSourceFactory.createDataSource(properties);
+                dataSourceMap.put(dbInfo.getId(), dataSource);
+                return dataSource;
             } catch (Exception e) {
                 throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
             }
@@ -139,28 +146,38 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
     
     @Async
     public void executeJob(JobInfo jobInfo, Connection systemConnection, Connection connection) {
+        long start1=System.currentTimeMillis();
+        long dataGenTime=0;
         log.info("start execute");
         Integer finishedNumSum=jobInfo.getFinishedNum();
         int finishedNum = 0;
         Integer mockNum = jobInfo.getMockNum();
         DatabaseType databaseType=MockTool.getDatabaseTypeByName(jobInfo.getDbType());
-        SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType,null);
+        SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType);
         SqlBuilder sqlBuilder = new SqlBuilder(sqlDialect);
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
         String tableName = sqlBuilder.sqlDialect.wrapTableName(metaTable.getTableName());
         if (StrUtil.isNotBlank(metaTable.getDbName())) {
             tableName = String.format("%s.%s", metaTable.getDbName(), tableName);
         }
-        
         try {
+            connection.setAutoCommit(false);
             connection.createStatement().execute(sqlBuilder.buildCreateTableSql(metaTable));
+            connection.commit();
             PreparedStatement preparedStatement = connection.prepareStatement(sqlDialect.getColumnIsExistSql(jobInfo.getDbName(), jobInfo.getTableName(), Constants.DEFAULT_JOB_MARKER_COLUMN));
             ResultSet resultSet= preparedStatement.executeQuery();
             if (!resultSet.next()) {
                 connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` ADD COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" bigint");
             }
         } catch (SQLException e) {
-            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
+            try {
+                connection.rollback();
+                connection.close();
+                systemConnection.close();
+            } catch (SQLException ex) {
+                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR,ex.getMessage());
+            }
+            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
         }
         
         try {
@@ -173,8 +190,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
                     .collect(Collectors.toList()));
             CompletableFuture<Boolean> completableFuture = CompletableFuture.supplyAsync(() -> true);
             systemConnection.createStatement().execute("UPDATE job_info SET status=1 WHERE id=" + jobInfo.getId());
-            
-            connection.setAutoCommit(false);
+    
             PreparedStatement insertJob=connection.prepareStatement("INSERT INTO " + tableName + "() VALUES ()");
             PreparedStatement insertEmptyJob = connection.prepareStatement("INSERT INTO " + tableName + "("+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+") VALUES ("+jobInfo.getId()+")");
             PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET finishedNum=? WHERE id=" + jobInfo.getId());
@@ -196,7 +212,10 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
                 }
                 else {
                     blockSize = Math.min(mockNum - finishedNum, blockSize);
-                    List<Map<String, Object>> mapList = dataBuilder.generateDataWithBlock(metaTable, blockNum, blockSize);
+                    
+                    long dataGenFrom=System.currentTimeMillis();
+                    List<Map<String, Object>> mapList = dataBuilder.generateDataByBlock(metaTable, blockNum, blockSize);
+                    dataGenTime+=System.currentTimeMillis()-dataGenFrom;
                     int finalBlockNum = blockNum;
                     int finalBlockSize = blockSize;
                     if (completableFuture.get()) {
@@ -247,6 +266,8 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
                 exception.setString(1, e.getMessage());
                 exception.setLong(2, jobInfo.getId());
                 exception.execute();
+                connection.close();
+                systemConnection.close();
             } catch (SQLException ex) {
                 throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
             }
@@ -259,7 +280,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         } catch (SQLException e) {
             log.error("jobId:{},connection close failed\nexception message:{}", jobInfo.getId(), e.getMessage());
         }
-        log.info("finished");
+        log.info("jobId:{}finished,mockNum:{},dataGenTime:{},totalTime:{}",jobInfo.getId(),mockNum,dataGenTime,System.currentTimeMillis()-start1);
     }
     
     @Override
@@ -269,9 +290,16 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
             PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=1 WHERE id=" + jobInfo.getId());
             updateJob.execute();
         } catch (SQLException e) {
+            try {
+                connection.close();
+                systemConnection.close();
+            } catch (SQLException ex) {
+                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, ex.getMessage());
+            }
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
         }
-        SqlDialect sqlDialect=new SqlBuilder().sqlDialect;
+        DatabaseType databaseType=MockTool.getDatabaseTypeByName(jobInfo.getDbType());
+        SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType);
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
         String tableName = sqlDialect.wrapTableName(metaTable.getTableName());
         if (StrUtil.isNotBlank(metaTable.getDbName())) {
@@ -296,8 +324,10 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
             try {
                 PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=2 WHERE id=" + jobInfo.getId());
                 updateJob.execute();
+                connection.close();
+                systemConnection.close();
             } catch (SQLException ex) {
-                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
+                throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, ex.getMessage());
             }
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
         }

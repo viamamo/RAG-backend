@@ -1,21 +1,25 @@
 package com.kesei.rag.controller;
 
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.alibaba.excel.EasyExcel;
 import com.kesei.rag.entity.dto.GenericPostRequest;
 import com.kesei.rag.entity.dto.GenericResponse;
+import com.kesei.rag.entity.dto.sql.GenerateFromSqlRequest;
 import com.kesei.rag.entity.vo.GenerationVO;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.support.ResponseCode;
+import com.kesei.rag.mocker.support.dialect.SqlDialect;
+import com.kesei.rag.mocker.support.dialect.SqlDialectFactory;
+import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.service.SqlService;
+import com.kesei.rag.support.BasicInfo;
 import com.kesei.rag.support.utils.ResponseUtils;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.net.URLEncoder;
@@ -37,6 +41,9 @@ public class SqlController {
     @Resource
     private SqlService sqlService;
     
+    @Resource
+    private BasicInfo basicInfo;
+    
     @PostMapping("/generate/schema")
     public GenericResponse<GenerationVO> generateBySchema(@RequestBody MetaTable metaTable) {
         return ResponseUtils.success(sqlService.generateBySchema(metaTable));
@@ -53,16 +60,16 @@ public class SqlController {
     /**
      * 根据 SQL 获取 schema
      *
-     * @param sqlPostRequest
+     * @param generateFromSqlRequest
      * @return
      */
     @PostMapping("/get/schema/sql")
-    public GenericResponse<MetaTable> getSchemaBySql(@RequestBody GenericPostRequest sqlPostRequest) {
-        if (sqlPostRequest == null) {
+    public GenericResponse<MetaTable> getSchemaBySql(@RequestBody GenerateFromSqlRequest generateFromSqlRequest) {
+        if (generateFromSqlRequest == null) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
-        // 获取 tableSchema
-        return ResponseUtils.success(sqlService.getSchemaBySql(sqlPostRequest.getContent()));
+        SqlDialect sqlDialect= SqlDialectFactory.getDialect(MockTool.getDatabaseTypeByName(generateFromSqlRequest.getDbType()));
+        return ResponseUtils.success(sqlService.getSchemaBySql(generateFromSqlRequest.getContent(), sqlDialect));
     }
     
     @PostMapping("/get/schema/excel")
@@ -112,4 +119,9 @@ public class SqlController {
         }
     }
     
+    
+    @GetMapping("/get_basic_info")
+    public GenericResponse<JSONObject> getBasicInfo(){
+        return ResponseUtils.success(JSONUtil.parseObj(basicInfo));
+    }
 }

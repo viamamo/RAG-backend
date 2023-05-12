@@ -70,6 +70,6 @@ public class MysqlDialect implements SqlDialect {
      */
     @Override
     public String getColumnIsExistSql(String dbName, String tableName, String columnName) {
-        return "SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='"+dbName+"' AND `TABLE_NAME`='"+tableName+"' AND `COLUMN_NAME`='"+dbName+"'";
+        return "SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='"+dbName+"' AND `TABLE_NAME`='"+tableName+"' AND `COLUMN_NAME`='"+columnName+"'";
     }
 }

@@ -41,7 +41,7 @@ public class FieldInfoServiceImpl extends ServiceImpl<FieldInfoMapper, FieldInfo
             // 校验字段内容
             try {
                 MetaTable.MetaField metaField = JSONUtil.toBean(content, MetaTable.MetaField.class);
-                GeneratorFacade.validField(metaField);
+                GeneratorFacade.validMetaField(metaField);
                 // 填充 fieldName
                 fieldInfo.setFieldName(metaField.getFieldName());
             } catch (Exception e) {

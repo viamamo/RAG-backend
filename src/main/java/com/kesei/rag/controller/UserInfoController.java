@@ -68,6 +68,7 @@ public class UserInfoController {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
         UserInfo userInfo = userInfoService.userLogin(userAccount, userPassword, request);
+        log.info("{}",request.getSession().getAttribute(Constants.USER_STATE));
         return ResponseUtils.success(userInfo);
     }
     

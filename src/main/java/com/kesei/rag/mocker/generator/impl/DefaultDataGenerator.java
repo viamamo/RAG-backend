@@ -3,6 +3,8 @@ package com.kesei.rag.mocker.generator.impl;
 import cn.hutool.core.date.DateUtil;
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.generator.DataGenerator;
+import com.kesei.rag.mocker.generator.DataGeneratorAnnotation;
+import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.support.Constants;
 import org.apache.commons.lang3.StringUtils;
 
@@ -13,6 +15,7 @@ import java.util.List;
 /**
  * @author kesei
  */
+@DataGeneratorAnnotation(mockType = MockType.NONE)
 public class DefaultDataGenerator implements DataGenerator {
     @Override
     public List<String> doGenerate(MetaTable.MetaField metaField, int rowNum) {

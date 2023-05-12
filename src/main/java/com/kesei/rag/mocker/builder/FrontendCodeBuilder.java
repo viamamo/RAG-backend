@@ -27,14 +27,7 @@ import java.util.Optional;
 public class FrontendCodeBuilder {
     
     @Resource
-    FreeMarkerConfigurer freeMarkerConfigurer;
-    
-    // private static Configuration configuration;
-    //
-    // @Resource
-    // public void setConfiguration(Configuration configuration) {
-    //     FrontendCodeBuilder.configuration = configuration;
-    // }
+    private FreeMarkerConfigurer freeMarkerConfigurer;
     
     /**
      * 构造 Typescript 类型代码

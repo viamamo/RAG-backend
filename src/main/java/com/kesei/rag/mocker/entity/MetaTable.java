@@ -1,5 +1,6 @@
 package com.kesei.rag.mocker.entity;
 
+import com.kesei.rag.mocker.support.DatabaseType;
 import lombok.Data;
 
 import java.util.List;
@@ -14,6 +15,11 @@ public class MetaTable {
      * 库名
      */
     private String dbName;
+    
+    /**
+     * 库类型
+     */
+    private String dbType= DatabaseType.MYSQL.toString();
     
     /**
      * 表名

@@ -1,6 +1,7 @@
 package com.kesei.rag.mocker.entity;
 
 import cn.hutool.core.io.FileTypeUtil;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
@@ -16,10 +17,8 @@ import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
-import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
 import com.kesei.rag.service.FieldInfoService;
 import com.kesei.rag.support.Constants;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -30,8 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
@@ -43,16 +40,9 @@ public class MetaTableBuilder {
     
     private static FieldInfoService fieldInfoService;
     
-    private static SqlDialect sqlDialect;
-    
     @Resource
     public void setFieldInfoService(FieldInfoService fieldInfoService) {
         MetaTableBuilder.fieldInfoService = fieldInfoService;
-    }
-    
-    @PostConstruct
-    public void init() {
-        sqlDialect = new MysqlDialect();
     }
     
     /**
@@ -106,7 +96,7 @@ public class MetaTableBuilder {
      *
      * @return 生成的 TableSchema
      */
-    public static MetaTable buildFromSql(String sql) {
+    public static MetaTable buildFromSql(String sql,SqlDialect sqlDialect) {
         if (StrUtil.isBlank(sql)) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
@@ -243,7 +233,7 @@ public class MetaTableBuilder {
             return FieldType.INT.getValue();
         }
         // 小数
-        if (isDouble(value)) {
+        if (NumberUtil.isDouble(value)) {
             return FieldType.DOUBLE.getValue();
         }
         // 日期
@@ -251,19 +241,6 @@ public class MetaTableBuilder {
             return FieldType.DATETIME.getValue();
         }
         return FieldType.TEXT.getValue();
-    }
-    
-    /**
-     * 判断字符串是不是 double 型
-     *
-     * @param str
-     *
-     * @return
-     */
-    private static boolean isDouble(String str) {
-        Pattern pattern = Pattern.compile("\\d+[.]?\\d*[dD]?");
-        Matcher isNum = pattern.matcher(str);
-        return isNum.matches();
     }
     
     /**

@@ -7,7 +7,7 @@ public enum DatabaseType {
     /**
      * 数据库类型
      */
-    MYSQL("MySql","mysql://",3306),
+    MYSQL("MySQL","mysql://",3306),
     POSTGRES("PostgreSQL","postgresql://",5432),
     ORACLE("Oracle","oracle:thin:@",1521),
     SQLSERVER("SQLServer","sqlserver://",1433),

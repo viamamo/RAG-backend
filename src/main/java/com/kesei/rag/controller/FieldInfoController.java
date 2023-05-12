@@ -1,7 +1,6 @@
 package com.kesei.rag.controller;
 
 import cn.hutool.core.util.StrUtil;
-import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kesei.rag.aop.AuthCheck;
@@ -11,8 +10,6 @@ import com.kesei.rag.entity.dto.field.FieldInfoPostRequest;
 import com.kesei.rag.entity.po.FieldInfo;
 import com.kesei.rag.entity.po.UserInfo;
 import com.kesei.rag.exception.GenericException;
-import com.kesei.rag.mocker.builder.SqlBuilder;
-import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.service.FieldInfoService;
 import com.kesei.rag.service.UserInfoService;
@@ -130,12 +127,10 @@ public class FieldInfoController {
      * 分页获取列表
      *
      * @param fieldInfoGetRequest
-     * @param request
      * @return
      */
     @GetMapping("/list/page")
-    public GenericResponse<Page<FieldInfo>> listFieldInfoByPage(FieldInfoGetRequest fieldInfoGetRequest,
-                                                             HttpServletRequest request) {
+    public GenericResponse<Page<FieldInfo>> listFieldInfoByPage(FieldInfoGetRequest fieldInfoGetRequest) {
         long pageNum = fieldInfoGetRequest.getPaginationNum();
         long pageSize = fieldInfoGetRequest.getPaginationSize();
         Page<FieldInfo> fieldInfoPage = fieldInfoService.page(new Page<>(pageNum, pageSize),

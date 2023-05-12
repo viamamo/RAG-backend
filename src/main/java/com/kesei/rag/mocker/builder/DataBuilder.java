@@ -6,6 +6,7 @@ import com.kesei.rag.mocker.generator.DataGenerator;
 import com.kesei.rag.mocker.generator.DataGeneratorFactory;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.utils.MockTool;
+import com.kesei.rag.support.utils.SpringContextUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,8 @@ import java.util.*;
 @Slf4j
 public class DataBuilder {
     
+    private DataGeneratorFactory dataGeneratorFactory;
+    
     /**
      * 生成数据
      *
@@ -27,6 +30,9 @@ public class DataBuilder {
      * @return
      */
     public List<Map<String, Object>> generateData(MetaTable metaTable, int rowNum) {
+        if(dataGeneratorFactory==null){
+            dataGeneratorFactory=SpringContextUtils.getBean(DataGeneratorFactory.class);
+        }
         List<MetaTable.MetaField> fieldList = metaTable.getMetaFieldList();
         // 初始化结果数据
         List<Map<String, Object>> resultList = new ArrayList<>(rowNum);
@@ -37,7 +43,7 @@ public class DataBuilder {
         for (MetaTable.MetaField field : fieldList) {
             MockType mockTypeEnum = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
                     .orElse(MockType.NONE);
-            DataGenerator dataGenerator = DataGeneratorFactory.getGenerator(mockTypeEnum);
+            DataGenerator dataGenerator = dataGeneratorFactory.getGenerator(mockTypeEnum);
             List<String> mockDataList = dataGenerator.doGenerate(field, rowNum);
             String fieldName = field.getFieldName();
             // 填充结果列表
@@ -50,7 +56,7 @@ public class DataBuilder {
         return resultList;
     }
     
-    public List<Map<String, Object>> generateDataWithBlock(MetaTable metaTable, int blockNumber, int blockSize) {
+    public List<Map<String, Object>> generateDataByBlock(MetaTable metaTable, int blockNumber, int blockSize) {
         List<MetaTable.MetaField> fieldList = metaTable.getMetaFieldList();
         // 初始化结果数据
         List<Map<String, Object>> resultList = new ArrayList<>(blockSize);
@@ -61,7 +67,7 @@ public class DataBuilder {
         for (MetaTable.MetaField field : fieldList) {
             MockType mockTypeEnum = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
                     .orElse(MockType.NONE);
-            DataGenerator dataGenerator = DataGeneratorFactory.getGenerator(mockTypeEnum);
+            DataGenerator dataGenerator = dataGeneratorFactory.getGenerator(mockTypeEnum);
             List<String> mockDataList = dataGenerator.doGenerateBlock(field, blockNumber, blockSize);
             String fieldName = field.getFieldName();
             // 填充结果列表

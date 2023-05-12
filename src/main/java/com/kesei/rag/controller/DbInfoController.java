@@ -20,11 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * @author kesei
@@ -118,59 +114,6 @@ public class DbInfoController{
         long pageSize = dbInfoGetRequest.getPaginationSize();
         Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize),
                 getQueryWrapper(dbInfoGetRequest));
-        return ResponseUtils.success(dbInfoPage);
-    }
-    
-    /**
-     * 获取当前用户可选的全部资源列表（只返回 id 和名称）
-     *
-     * @param dbInfoGetRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/my/list")
-    public GenericResponse<List<DbInfo>> listMyDbInfo(DbInfoGetRequest dbInfoGetRequest,
-                                                            HttpServletRequest request) {
-        DbInfo dbInfoQuery = new DbInfo();
-        if (dbInfoGetRequest == null) {
-            throw new GenericException(ResponseCode.PARAMS_ERROR);
-        }
-        BeanUtils.copyProperties(dbInfoGetRequest, dbInfoQuery);
-        QueryWrapper<DbInfo> queryWrapper = getQueryWrapper(dbInfoGetRequest);
-        final String[] fields = new String[]{"id", "name"};
-        queryWrapper.select(fields);
-        List<DbInfo> dbInfoList = dbInfoService.list(queryWrapper);
-        try {
-            UserInfo currentUser = userInfoService.getCurrentUser(request);
-            dbInfoQuery.setUserId(currentUser.getId());
-            queryWrapper = new QueryWrapper<>(dbInfoQuery);
-            queryWrapper.select(fields);
-            dbInfoList.addAll(dbInfoService.list(queryWrapper));
-        } catch (Exception e) {
-            // 未登录
-        }
-        // 根据 id 去重
-        List<DbInfo> resultList = dbInfoList.stream().collect(Collectors.collectingAndThen(
-                Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(DbInfo::getId))), ArrayList::new));
-        return ResponseUtils.success(resultList);
-    }
-    
-    /**
-     * 分页获取当前用户可选的资源列表
-     *
-     * @param dbInfoGetRequest
-     * @param request
-     * @return
-     */
-    @GetMapping("/my/list/page")
-    public GenericResponse<Page<DbInfo>> listMyDbInfoByPage(DbInfoGetRequest dbInfoGetRequest,
-                                                                  HttpServletRequest request) {
-        UserInfo currentUser = userInfoService.getCurrentUser(request);
-        long pageNum = dbInfoGetRequest.getPaginationNum();
-        long pageSize = dbInfoGetRequest.getPaginationSize();
-        QueryWrapper<DbInfo> queryWrapper = getQueryWrapper(dbInfoGetRequest);
-        queryWrapper.eq("userId", currentUser.getId());
-        Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize), queryWrapper);
         return ResponseUtils.success(dbInfoPage);
     }
     

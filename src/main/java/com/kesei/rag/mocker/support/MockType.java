@@ -7,20 +7,27 @@ public enum MockType {
     /**
      * 模拟类型
      */
-    NONE("不模拟"),
-    INCREASE("递增"),
-    FIXED("固定"),
-    RANDOM("随机"),
-    REGEX("正则"),
-    DICT("词库");
+    NONE("不模拟", ""),
+    INCREASE("递增", "起始值"),
+    FIXED("固定", "固定值"),
+    RANDOM("随机", "随机规则"),
+    REGEX("正则", "正则表达式"),
+    DICT("词库", "词库");
     
     private final String value;
     
-    MockType(String value) {
+    private final String mockParamName;
+    
+    MockType(String value, String mockParamName) {
         this.value = value;
+        this.mockParamName = mockParamName;
     }
     
     public String getValue() {
         return value;
+    }
+    
+    public String getMockParamName() {
+        return mockParamName;
     }
 }

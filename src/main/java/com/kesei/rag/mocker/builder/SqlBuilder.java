@@ -3,19 +3,16 @@ package com.kesei.rag.mocker.builder;
 import cn.hutool.core.util.StrUtil;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
-import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.FieldType;
 import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
-import com.kesei.rag.mocker.support.dialect.SqlDialectFactory;
-import com.kesei.rag.mocker.support.dialect.impl.MysqlDialect;
 import com.kesei.rag.mocker.support.utils.MockTool;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -29,22 +26,10 @@ public class SqlBuilder {
      */
     public SqlDialect sqlDialect;
     
-    public SqlBuilder() {
-        this.sqlDialect = SqlDialectFactory.getDialect(DatabaseType.MYSQL,MysqlDialect.class.getName());
-    }
-    
     public SqlBuilder(SqlDialect sqlDialect) {
         this.sqlDialect = sqlDialect;
     }
     
-    /**
-     * 设置方言
-     *
-     * @param sqlDialect
-     */
-    public void setSqlDialect(SqlDialect sqlDialect) {
-        this.sqlDialect = sqlDialect;
-    }
     
     /**
      * 构造建表 SQL
@@ -115,6 +100,9 @@ public class SqlBuilder {
         fieldStrBuilder.append(fieldName);
         // 字段类型
         fieldStrBuilder.append(" ").append(fieldType);
+        if(Objects.equals(fieldType, "varchar")){
+            fieldStrBuilder.append("(255)");
+        }
         // 默认值
         if (StrUtil.isNotBlank(defaultValue)) {
             fieldStrBuilder.append(" ").append("default ").append(getValueStr(metaField, defaultValue));
@@ -183,51 +171,18 @@ public class SqlBuilder {
         return resultStringBuilder.toString();
     }
     
-    public List<String> buildInsertSqlList(MetaTable metaTable, List<Map<String, Object>> dataList) {
-        List<String> sqlList=new ArrayList<>(dataList.size());
-        // 构造模板
-        String template = "insert into %s (%s) values (%s);";
-        // 构造表名
-        String tableName = sqlDialect.wrapTableName(metaTable.getTableName());
-        String dbName = metaTable.getDbName();
-        if (StrUtil.isNotBlank(dbName)) {
-            tableName = String.format("%s.%s", dbName, tableName);
-        }
-        // 构造表字段
-        List<MetaTable.MetaField> metaFieldList = metaTable.getMetaFieldList();
-        // 过滤掉不模拟的字段
-        metaFieldList = metaFieldList.stream()
-                .filter(field -> {
-                    MockType mockType = Optional.ofNullable(MockTool.getMockTypeByValue(field.getMockType()))
-                            .orElse(MockType.NONE);
-                    return !MockType.NONE.equals(mockType);
-                })
-                .collect(Collectors.toList());
-        for (Map<String, Object> dataRow : dataList) {
-            String keyStr = metaFieldList.stream()
-                    .map(field -> sqlDialect.wrapFieldName(field.getFieldName()))
-                    .collect(Collectors.joining(", "));
-            String valueStr = metaFieldList.stream()
-                    .map(field -> getValueStr(field, dataRow.get(field.getFieldName())))
-                    .collect(Collectors.joining(", "));
-            // 填充模板
-            sqlList.add(String.format(template, tableName, keyStr, valueStr));
-        }
-        return sqlList;
-    }
-    
     /**
      * 根据列的属性获取值字符串
      *
-     * @param field
+     * @param metaField
      * @param value
      * @return
      */
-    public static String getValueStr(MetaTable.MetaField field, Object value) {
-        if (field == null || value == null) {
+    public static String getValueStr(MetaTable.MetaField metaField, Object value) {
+        if (metaField == null || value == null) {
             return "''";
         }
-        FieldType fieldType = Optional.ofNullable(MockTool.getFieldTypeByValue(field.getFieldType()))
+        FieldType fieldType = Optional.ofNullable(MockTool.getFieldTypeByValue(metaField.getFieldType()))
                 .orElse(FieldType.TEXT);
         String result = String.valueOf(value);
         return switch (fieldType) {

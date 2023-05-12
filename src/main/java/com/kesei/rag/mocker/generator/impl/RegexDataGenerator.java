@@ -2,6 +2,8 @@ package com.kesei.rag.mocker.generator.impl;
 
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.generator.DataGenerator;
+import com.kesei.rag.mocker.generator.DataGeneratorAnnotation;
+import com.kesei.rag.mocker.support.MockType;
 import com.mifmif.common.regex.Generex;
 
 import java.util.ArrayList;
@@ -10,6 +12,7 @@ import java.util.List;
 /**
  * @author kesei
  */
+@DataGeneratorAnnotation(mockType = MockType.REGEX)
 public class RegexDataGenerator implements DataGenerator {
     @Override
     public List<String> doGenerate(MetaTable.MetaField metaField, int rowNum) {

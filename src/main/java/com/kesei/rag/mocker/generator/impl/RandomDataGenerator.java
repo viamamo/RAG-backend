@@ -2,7 +2,9 @@ package com.kesei.rag.mocker.generator.impl;
 
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.generator.DataGenerator;
+import com.kesei.rag.mocker.generator.DataGeneratorAnnotation;
 import com.kesei.rag.mocker.support.FakerType;
+import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.utils.FakerUtils;
 import com.kesei.rag.mocker.support.utils.MockTool;
 
@@ -13,6 +15,7 @@ import java.util.Optional;
 /**
  * @author kesei
  */
+@DataGeneratorAnnotation(mockType = MockType.RANDOM)
 public class RandomDataGenerator implements DataGenerator {
     @Override
     public List<String> doGenerate(MetaTable.MetaField metaField, int rowNum) {

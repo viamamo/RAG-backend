@@ -41,7 +41,7 @@ public class TableInfoServiceImpl extends ServiceImpl<TableInfoMapper, TableInfo
             // 校验字段内容
             try {
                 MetaTable metaTable = JSONUtil.toBean(content, MetaTable.class);
-                GeneratorFacade.validSchema(metaTable);
+                GeneratorFacade.validMetaTable(metaTable);
             } catch (Exception e) {
                 throw new GenericException(ResponseCode.PARAMS_ERROR, "内容格式错误");
             }

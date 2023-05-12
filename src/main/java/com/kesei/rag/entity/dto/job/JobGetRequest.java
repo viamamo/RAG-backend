@@ -7,5 +7,5 @@ import lombok.Data;
  * @author kesei
  */
 @Data
-public class JobInfoGetRequest extends GenericGetRequest {
+public class JobGetRequest extends GenericGetRequest {
 }

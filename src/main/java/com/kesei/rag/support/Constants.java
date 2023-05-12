@@ -66,6 +66,7 @@ public class Constants {
     // generator
     
     public static final String CURRENT_TIMESTAMP="CURRENT_TIMESTAMP";
+    public static final String GENERATOR_PACKAGE="com.kesei.rag.mocker.generator.impl";
     
     // metaTable build
     

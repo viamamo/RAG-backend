@@ -5,6 +5,8 @@ import com.kesei.rag.entity.po.DictInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
 import com.kesei.rag.mocker.generator.DataGenerator;
+import com.kesei.rag.mocker.generator.DataGeneratorAnnotation;
+import com.kesei.rag.mocker.support.MockType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.service.DictInfoService;
 import com.kesei.rag.support.utils.SpringContextUtils;
@@ -12,15 +14,21 @@ import org.apache.commons.lang3.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author kesei
  */
+@DataGeneratorAnnotation(mockType = MockType.DICT)
 public class DictDataGenerator implements DataGenerator {
     
-    private static final DictInfoService dictInfoService = SpringContextUtils.getBean(DictInfoService.class);
+    private DictInfoService dictInfoService=null;
+    
     @Override
     public List<String> doGenerate(MetaTable.MetaField metaField, int rowNum) {
+        if(Objects.isNull(dictInfoService)){
+            dictInfoService=SpringContextUtils.getBean(DictInfoService.class);
+        }
         String mockParams = metaField.getMockParams();
         long id = Long.parseLong(mockParams);
         DictInfo dictInfo = dictInfoService.getById(id);
@@ -38,6 +46,9 @@ public class DictDataGenerator implements DataGenerator {
     
     @Override
     public List<String> doGenerateBlock(MetaTable.MetaField metaField, int blockNumber, int blockSize) {
+        if(Objects.isNull(dictInfoService)){
+            dictInfoService=SpringContextUtils.getBean(DictInfoService.class);
+        }
         String mockParams = metaField.getMockParams();
         long id = Long.parseLong(mockParams);
         DictInfo dictInfo = dictInfoService.getById(id);

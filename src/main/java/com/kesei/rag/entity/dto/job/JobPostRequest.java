@@ -7,6 +7,6 @@ import lombok.Data;
  * @author kesei
  */
 @Data
-public class JobInfoPostRequest extends GenericPostRequest {
-    String operation;
+public class JobPostRequest extends GenericPostRequest {
+    private String operation;
 }

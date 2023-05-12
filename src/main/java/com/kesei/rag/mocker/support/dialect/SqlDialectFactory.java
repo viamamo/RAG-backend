@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -34,6 +35,7 @@ public class SqlDialectFactory {
             SqlDialectAnnotation annotation=clazz.getAnnotation(SqlDialectAnnotation.class);
             try {
                 DIALECT_POOL.put(annotation.databaseType(), (SqlDialect) clazz.getDeclaredConstructor().newInstance());
+                log.info("SqlDialectFactory mounted:{}",clazz.getName());
             } catch (Exception e) {
                 log.error("SqlDialectFactory construct failed, className:{}",clazz.getName(), new RuntimeException(e));
             }
@@ -47,19 +49,29 @@ public class SqlDialectFactory {
      * @return
      */
     public static SqlDialect getDialect(DatabaseType databaseType,String className) {
+        if(Objects.isNull(databaseType)){
+            throw new GenericException(ResponseCode.SYSTEM_ERROR,"数据库类型错误");
+        }
         SqlDialect dialect = DIALECT_POOL.get(databaseType);
-        if (null == dialect) {
+        if (Objects.isNull(dialect)) {
+            if(Objects.isNull(className)){
+                throw new GenericException(ResponseCode.SYSTEM_ERROR,"方言获取失败");
+            }
             synchronized (className.intern()) {
                 dialect = DIALECT_POOL.computeIfAbsent(databaseType,
                         key -> {
                             try {
                                 return (SqlDialect) Class.forName(className).getDeclaredConstructor().newInstance();
                             } catch (Exception e) {
-                                throw new GenericException(ResponseCode.SYSTEM_ERROR);
+                                throw new GenericException(ResponseCode.SYSTEM_ERROR,"方言获取失败");
                             }
                         });
             }
         }
         return dialect;
+    }
+    
+    public static SqlDialect getDialect(DatabaseType databaseType){
+        return getDialect(databaseType, null);
     }
 }

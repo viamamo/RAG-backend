@@ -34,13 +34,7 @@ import java.util.stream.Collectors;
 public class JavaCodeBuilder {
     
     @Resource
-    FreeMarkerConfigurer freeMarkerConfigurer;
-    // private static Configuration configuration;
-    //
-    // @Resource
-    // public void setConfiguration(Configuration configuration) {
-    //     JavaCodeBuilder.configuration = configuration;
-    // }
+    private FreeMarkerConfigurer freeMarkerConfigurer;
     
     /**
      * 构造 Java 实体代码
