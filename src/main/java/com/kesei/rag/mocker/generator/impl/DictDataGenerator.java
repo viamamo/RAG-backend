@@ -33,7 +33,7 @@ public class DictDataGenerator implements DataGenerator {
         long id = Long.parseLong(mockParams);
         DictInfo dictInfo = dictInfoService.getById(id);
         if (dictInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR, "词库不存在");
+            throw new GenericException(ResponseCode.NOT_FOUND_ERROR, "字段"+metaField.getFieldName()+"词库不存在");
         }
         List<String> wordList = JSONUtil.parseArray(dictInfo.getContent()).toList(String.class);
         List<String> list = new ArrayList<>(rowNum);
@@ -53,7 +53,7 @@ public class DictDataGenerator implements DataGenerator {
         long id = Long.parseLong(mockParams);
         DictInfo dictInfo = dictInfoService.getById(id);
         if (dictInfo == null) {
-            throw new GenericException(ResponseCode.NOT_FOUND_ERROR, "词库不存在");
+            throw new GenericException(ResponseCode.NOT_FOUND_ERROR, "字段"+metaField.getFieldName()+"词库不存在");
         }
         List<String> wordList = JSONUtil.parseArray(dictInfo.getContent()).toList(String.class);
         List<String> list = new ArrayList<>(blockSize);

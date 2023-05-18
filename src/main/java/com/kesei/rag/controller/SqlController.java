@@ -68,7 +68,7 @@ public class SqlController {
         if (generateFromSqlRequest == null) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
-        SqlDialect sqlDialect= SqlDialectFactory.getDialect(MockTool.getDatabaseTypeByName(generateFromSqlRequest.getDbType()));
+        SqlDialect sqlDialect= SqlDialectFactory.getDialect(MockTool.getDatabaseTypeByStr(generateFromSqlRequest.getDbType()));
         return ResponseUtils.success(sqlService.getSchemaBySql(generateFromSqlRequest.getContent(), sqlDialect));
     }
     

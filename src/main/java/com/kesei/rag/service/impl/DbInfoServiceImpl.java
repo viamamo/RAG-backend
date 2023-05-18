@@ -2,6 +2,8 @@ package com.kesei.rag.service.impl;
 
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kesei.rag.entity.po.DbInfo;
 import com.kesei.rag.exception.GenericException;
@@ -13,6 +15,9 @@ import com.kesei.rag.service.DbInfoService;
 import com.kesei.rag.support.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * @author kesei
@@ -30,11 +35,10 @@ public class DbInfoServiceImpl extends ServiceImpl<DbInfoMapper,DbInfo> implemen
         String dbName= dbInfo.getDbName();
         String dbType= dbInfo.getDbType();
         String username=dbInfo.getUsername();
-        String password=dbInfo.getPassword();
         String host=dbInfo.getHost();
         Integer port=dbInfo.getPort();
         // 创建时，所有参数必须非空
-        if (add && StrUtil.hasBlank(name, dbName,dbType,username,password,host)&& ObjectUtil.isNotEmpty(port)) {
+        if (add && StrUtil.hasBlank(name, dbName,dbType,username,host)&& ObjectUtil.isNotEmpty(port)) {
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
         if (StrUtil.isNotBlank(name) && name.length() > Constants.MAX_NAME_LENGTH) {
@@ -47,7 +51,7 @@ public class DbInfoServiceImpl extends ServiceImpl<DbInfoMapper,DbInfo> implemen
     @Override
     public String createUrl(DbInfo dbInfo) {
         log.info(dbInfo.toString());
-        DatabaseType databaseType=MockTool.getDatabaseTypeByName(dbInfo.getDbType());
+        DatabaseType databaseType=MockTool.getDatabaseTypeByStr(dbInfo.getDbType());
         StringBuilder stringBuilder=new StringBuilder("jdbc:");
         stringBuilder.append(databaseType.getProtocol());
         stringBuilder.append(dbInfo.getHost());
@@ -55,8 +59,17 @@ public class DbInfoServiceImpl extends ServiceImpl<DbInfoMapper,DbInfo> implemen
         stringBuilder.append(ObjectUtil.defaultIfNull(dbInfo.getPort(),databaseType.getDefaultPort()));
         stringBuilder.append("/");
         stringBuilder.append(dbInfo.getDbName());
-        if(StrUtil.isNotBlank(dbInfo.getProperty())) {
-            stringBuilder.append(dbInfo.getProperty());
+        if(!dbInfo.getProperty().isEmpty()){
+            stringBuilder.append("?");
+            JSONObject properties= JSONUtil.parseObj(dbInfo.getProperty());
+            Iterator<Map.Entry<String, Object>> iterator = properties.iterator();
+            while(iterator.hasNext()){
+                Map.Entry<String, Object> value=iterator.next();
+                stringBuilder.append(String.format("%s=%s", value.getKey().trim(),value.getValue().toString().trim()));
+                if(iterator.hasNext()){
+                    stringBuilder.append("&");
+                }
+            }
         }
         return stringBuilder.toString();
     }

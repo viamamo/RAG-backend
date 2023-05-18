@@ -13,6 +13,7 @@ import com.kesei.rag.entity.po.JobInfo;
 import com.kesei.rag.entity.po.UserInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.support.ResponseCode;
+import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.service.DbInfoService;
 import com.kesei.rag.service.UserInfoService;
 import com.kesei.rag.service.impl.JobServiceImpl;
@@ -77,12 +78,14 @@ public class JobController {
         long pageSize = jobGetRequest.getPaginationSize();
         Page<JobInfo> jobInfoPage = jobService.page(new Page<>(pageNum, pageSize),
                 getQueryWrapper(jobGetRequest));
+        jobInfoPage.getRecords().forEach((record)-> record.setDbType(MockTool.getDatabaseTypeByStr(record.getDbType()).getName()));
         return ResponseUtils.success(jobInfoPage);
     }
     
     @RequestMapping("/execute")
     public GenericResponse<Boolean> executeJob(@RequestBody JobPostRequest jobPostRequest) {
         JobInfo jobInfo= jobService.getById(jobPostRequest.getId());
+        DbInfo dbInfo=dbInfoService.getById(jobInfo.getDbId());
         Connection connection= jobService.getConnection(dbInfoService.getById(jobInfo.getDbId()));
         try {
             Connection systemConnection = jobService.getSystemConnection();

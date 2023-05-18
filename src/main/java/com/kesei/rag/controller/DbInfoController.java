@@ -1,6 +1,7 @@
 package com.kesei.rag.controller;
 
 import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.kesei.rag.entity.dto.GenericResponse;
@@ -10,6 +11,7 @@ import com.kesei.rag.entity.po.DbInfo;
 import com.kesei.rag.entity.po.UserInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.support.ResponseCode;
+import com.kesei.rag.mocker.support.utils.MockTool;
 import com.kesei.rag.service.DbInfoService;
 import com.kesei.rag.service.UserInfoService;
 import com.kesei.rag.support.Constants;
@@ -20,7 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author kesei
@@ -43,6 +47,13 @@ public class DbInfoController{
         }
         DbInfo dbInfo = new DbInfo();
         BeanUtils.copyProperties(dbInfoPostRequest, dbInfo);
+        Map<String,String> properties=new HashMap<>();
+        dbInfoPostRequest.getProperty().forEach((map)-> {
+            if (map.containsKey("key")&&map.containsKey("value")&&StrUtil.isNotBlank(map.get("key"))) {
+                properties.put(map.get("key"), map.get("value").trim());
+            }
+        });
+        dbInfo.setProperty(JSONUtil.parseObj(properties).toJSONString(0));
         // 校验
         dbInfoService.valid(dbInfo, true);
         UserInfo currentUser = userInfoService.getCurrentUser(request);
@@ -87,6 +98,7 @@ public class DbInfoController{
             throw new GenericException(ResponseCode.PARAMS_ERROR);
         }
         DbInfo dbInfo = dbInfoService.getById(id);
+        dbInfo.setDbType(MockTool.getDatabaseTypeByStr(dbInfo.getDbType()).getName());
         return ResponseUtils.success(dbInfo);
     }
     
@@ -99,6 +111,7 @@ public class DbInfoController{
     @GetMapping("/list")
     public GenericResponse<List<DbInfo>> listDbInfo(DbInfoGetRequest dbInfoGetRequest) {
         List<DbInfo> dbInfoList = dbInfoService.list(getQueryWrapper(dbInfoGetRequest));
+        dbInfoList.forEach((record)-> record.setDbType(MockTool.getDatabaseTypeByStr(record.getDbType()).getName()));
         return ResponseUtils.success(dbInfoList);
     }
     
@@ -114,6 +127,7 @@ public class DbInfoController{
         long pageSize = dbInfoGetRequest.getPaginationSize();
         Page<DbInfo> dbInfoPage = dbInfoService.page(new Page<>(pageNum, pageSize),
                 getQueryWrapper(dbInfoGetRequest));
+        dbInfoPage.getRecords().forEach((record)-> record.setDbType(MockTool.getDatabaseTypeByStr(record.getDbType()).getName()));
         return ResponseUtils.success(dbInfoPage);
     }
     

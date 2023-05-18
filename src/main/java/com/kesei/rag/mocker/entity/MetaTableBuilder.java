@@ -9,6 +9,7 @@ import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
 import com.alibaba.druid.sql.ast.statement.SQLPrimaryKey;
 import com.alibaba.druid.sql.ast.statement.SQLTableElement;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlCreateTableParser;
+import com.alibaba.druid.sql.parser.SQLCreateTableParser;
 import com.alibaba.excel.EasyExcel;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.kesei.rag.entity.po.FieldInfo;
@@ -102,8 +103,8 @@ public class MetaTableBuilder {
         }
         try {
             // 解析 SQL
-            MySqlCreateTableParser parser = new MySqlCreateTableParser(sql);
-            SQLCreateTableStatement sqlCreateTableStatement = parser.parseCreateTable();
+            SQLCreateTableParser sqlCreateTableParser = sqlDialect.getSQLCreateTableParser(sql);
+            SQLCreateTableStatement sqlCreateTableStatement = sqlCreateTableParser.parseCreateTable();
             MetaTable metaTable = new MetaTable();
             metaTable.setDbName(sqlCreateTableStatement.getSchema());
             metaTable.setTableName(sqlDialect.parseTableName(sqlCreateTableStatement.getTableName()));
@@ -129,7 +130,7 @@ public class MetaTableBuilder {
                 } else if (sqlTableElement instanceof SQLColumnDefinition columnDefinition) {
                     MetaTable.MetaField metaField = new MetaTable.MetaField();
                     metaField.setFieldName(sqlDialect.parseFieldName(columnDefinition.getNameAsString()));
-                    metaField.setFieldType(columnDefinition.getDataType().toString());
+                    metaField.setFieldType(columnDefinition.getDataType().getName());
                     String defaultValue = null;
                     if (columnDefinition.getDefaultExpr() != null) {
                         defaultValue = columnDefinition.getDefaultExpr().toString();
@@ -146,7 +147,7 @@ public class MetaTableBuilder {
                     metaField.setComment(comment);
                     metaField.setPrimaryKey(columnDefinition.isPrimaryKey());
                     metaField.setAutoIncrement(columnDefinition.isAutoIncrement());
-                    metaField.setMockType(MockType.NONE.getValue());
+                    metaField.setMockType(MockType.NONE.toString());
                     metaFieldList.add(metaField);
                 }
             }
@@ -222,7 +223,7 @@ public class MetaTableBuilder {
         }
         // 布尔
         if ("false".equalsIgnoreCase(value) || "true".equalsIgnoreCase(value)) {
-            return FieldType.TINYINT.getValue();
+            return FieldType.BOOLEAN.getValue();
         }
         // 整数
         if (StrUtil.isNumeric(value)) {
@@ -230,15 +231,15 @@ public class MetaTableBuilder {
             if (number > Integer.MAX_VALUE) {
                 return FieldType.BIGINT.getValue();
             }
-            return FieldType.INT.getValue();
+            return FieldType.INTEGER.getValue();
         }
         // 小数
         if (NumberUtil.isDouble(value)) {
-            return FieldType.DOUBLE.getValue();
+            return FieldType.DOUBLE_PRECISION.getValue();
         }
         // 日期
         if (isDate(value)) {
-            return FieldType.DATETIME.getValue();
+            return FieldType.TIMESTAMP.getValue();
         }
         return FieldType.TEXT.getValue();
     }

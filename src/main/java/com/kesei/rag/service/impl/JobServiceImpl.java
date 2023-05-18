@@ -2,8 +2,10 @@ package com.kesei.rag.service.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONUtil;
+import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.kesei.rag.entity.po.DbInfo;
@@ -100,7 +102,9 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
                 if (StrUtil.isNotBlank(dbInfo.getDriver())) {
                     properties.setProperty("driver", dbInfo.getDriver());
                 }
-                DataSource dataSource=DruidDataSourceFactory.createDataSource(properties);
+                DruidDataSource dataSource= (DruidDataSource) DruidDataSourceFactory.createDataSource(properties);
+                dataSource.setBreakAfterAcquireFailure(true);
+                dataSource.setFailFast(true);
                 dataSourceMap.put(dbInfo.getId(), dataSource);
                 return dataSource;
             } catch (Exception e) {
@@ -118,7 +122,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         try {
             return dataSource.getConnection();
         } catch (Exception e) {
-            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
+            throw new GenericException(ResponseCode.SQL_OPERATION_ERROR,"获取连接失败:"+e.getMessage());
         }
     }
     
@@ -152,7 +156,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         Integer finishedNumSum=jobInfo.getFinishedNum();
         int finishedNum = 0;
         Integer mockNum = jobInfo.getMockNum();
-        DatabaseType databaseType=MockTool.getDatabaseTypeByName(jobInfo.getDbType());
+        DatabaseType databaseType=MockTool.getDatabaseTypeByStr(jobInfo.getDbType());
         SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType);
         SqlBuilder sqlBuilder = new SqlBuilder(sqlDialect);
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
@@ -162,12 +166,14 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         }
         try {
             connection.setAutoCommit(false);
-            connection.createStatement().execute(sqlBuilder.buildCreateTableSql(metaTable));
+            String createTableSql=sqlBuilder.buildCreateTableSql(metaTable);
+            log.info("{}", createTableSql);
+            connection.createStatement().execute(createTableSql);
             connection.commit();
-            PreparedStatement preparedStatement = connection.prepareStatement(sqlDialect.getColumnIsExistSql(jobInfo.getDbName(), jobInfo.getTableName(), Constants.DEFAULT_JOB_MARKER_COLUMN));
+            PreparedStatement preparedStatement = connection.prepareStatement(sqlDialect.getColumnIsExistSql(jobInfo, Constants.DEFAULT_JOB_MARKER_COLUMN));
             ResultSet resultSet= preparedStatement.executeQuery();
             if (!resultSet.next()) {
-                connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` ADD COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" bigint");
+                connection.createStatement().execute("ALTER TABLE " + sqlDialect.wrapTableName(jobInfo.getTableName()) + " ADD COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN)+" bigint");
             }
         } catch (SQLException e) {
             try {
@@ -196,7 +202,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
             PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET finishedNum=? WHERE id=" + jobInfo.getId());
             
             int blockNum = 0;
-            int blockSize = Math.min(mockNum/1000,Constants.DEFAULT_BLOCK_SIZE);
+            int blockSize = Math.min(Math.max(100,mockNum/1000),Constants.DEFAULT_BLOCK_SIZE);
             boolean emptySql = CollectionUtil.isEmpty(dataBuilder.generateData(metaTable, 1));
             if (emptySql){
                 for (int i = 0; i < blockSize; i++) {
@@ -298,7 +304,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
             }
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR, e.getMessage());
         }
-        DatabaseType databaseType=MockTool.getDatabaseTypeByName(jobInfo.getDbType());
+        DatabaseType databaseType=MockTool.getDatabaseTypeByStr(jobInfo.getDbType());
         SqlDialect sqlDialect = SqlDialectFactory.getDialect(databaseType);
         MetaTable metaTable = JSONUtil.toBean(jobInfo.getContent(), MetaTable.class);
         String tableName = sqlDialect.wrapTableName(metaTable.getTableName());
@@ -316,7 +322,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
             if(resultSet.next())
                 totalCount=resultSet.getInt("totalCount");
             if (totalCount==0) {
-                connection.createStatement().execute("ALTER TABLE`" + jobInfo.getTableName() + "` DROP COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN));
+                connection.createStatement().execute("ALTER TABLE " + sqlDialect.wrapTableName(jobInfo.getTableName()) + " DROP COLUMN "+sqlDialect.wrapFieldName(Constants.DEFAULT_JOB_MARKER_COLUMN));
             }
             PreparedStatement updateJob = systemConnection.prepareStatement("UPDATE job_info SET status=3 WHERE id=" + jobInfo.getId());
             updateJob.execute();

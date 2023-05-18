@@ -1,9 +1,9 @@
 package com.kesei.rag.mocker.support.dialect.impl;
 
 import cn.hutool.core.util.StrUtil;
-import com.alibaba.druid.sql.dialect.mysql.parser.MySqlCreateTableParser;
+import cn.hutool.json.JSONUtil;
+import com.alibaba.druid.sql.dialect.postgresql.parser.PGCreateTableParser;
 import com.alibaba.druid.sql.parser.SQLCreateTableParser;
-import com.alibaba.druid.sql.parser.SQLParser;
 import com.kesei.rag.entity.po.JobInfo;
 import com.kesei.rag.exception.GenericException;
 import com.kesei.rag.mocker.entity.MetaTable;
@@ -13,7 +13,6 @@ import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import com.kesei.rag.mocker.support.dialect.SqlDialectAnnotation;
 import com.kesei.rag.mocker.support.utils.MockTool;
-import com.kesei.rag.support.Constants;
 
 import java.util.List;
 import java.util.Map;
@@ -24,54 +23,57 @@ import java.util.stream.Collectors;
 /**
  * @author kesei
  */
-@SqlDialectAnnotation(databaseType = DatabaseType.MYSQL)
-public class MysqlDialect implements SqlDialect {
-    
+@SqlDialectAnnotation(databaseType = DatabaseType.POSTGRESQL)
+public class PostgresqlDialect implements SqlDialect {
     /**
      * 封装字段名
      *
      * @param name
+     *
      * @return
      */
     @Override
     public String wrapFieldName(String name) {
-        return String.format("`%s`", name);
+        return String.format("\"%s\"", name);
     }
     
     /**
      * 解析字段名
      *
      * @param fieldName
+     *
      * @return
      */
     @Override
     public String parseFieldName(String fieldName) {
-        if (fieldName.startsWith(Constants.MYSQL_ESCAPE_CHARACTER) && fieldName.endsWith(Constants.MYSQL_ESCAPE_CHARACTER)) {
+        if (fieldName.startsWith("\"") && fieldName.endsWith("\"")) {
             return fieldName.substring(1, fieldName.length() - 1);
         }
         return fieldName;
     }
     
     /**
-     * 包装表名
+     * 封装表名
      *
      * @param name
+     *
      * @return
      */
     @Override
     public String wrapTableName(String name) {
-        return String.format("`%s`", name);
+        return String.format("\"%s\"", name);
     }
     
     /**
      * 解析表名
      *
      * @param tableName
+     *
      * @return
      */
     @Override
     public String parseTableName(String tableName) {
-        if (tableName.startsWith(Constants.MYSQL_ESCAPE_CHARACTER) && tableName.endsWith(Constants.MYSQL_ESCAPE_CHARACTER)) {
+        if (tableName.startsWith("\"") && tableName.endsWith("\"")) {
             return tableName.substring(1, tableName.length() - 1);
         }
         return tableName;
@@ -85,13 +87,15 @@ public class MysqlDialect implements SqlDialect {
      */
     @Override
     public String getColumnIsExistSql(JobInfo jobInfo, String columnName) {
-        return "SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='"+jobInfo.getDbName()+"' AND `TABLE_NAME`='"+jobInfo.getTableName()+"' AND `COLUMN_NAME`='"+columnName+"'";
+        String schema = JSONUtil.parseObj(jobInfo.getProperty()).getOrDefault("current_schema", "public").toString();
+        return "select column_name from information_schema.columns WHERE table_schema = '"+schema+"' and table_name = '"+jobInfo.getTableName()+"' and column_name = '"+columnName+"';";
     }
     
     /**
      * 构造建表 SQL
      *
      * @param metaTable 表概要
+     *
      * @return 生成的 SQL
      */
     @Override
@@ -102,21 +106,20 @@ public class MysqlDialect implements SqlDialect {
                 create table if not exists %s
                 (
                 %s
-                ) %s;""";
+                );
+                %s""";
         // 构造表名
         String tableName = wrapTableName(metaTable.getTableName());
         String dbName = metaTable.getDbName();
         if (StrUtil.isNotBlank(dbName)) {
             tableName = String.format("%s.%s", dbName, tableName);
         }
-        // 构造表前缀注释
+        // 构造表前注释
         String tableComment = metaTable.getTableComment();
         if (StrUtil.isBlank(tableComment)) {
             tableComment = tableName;
         }
         String tablePrefixComment = String.format("-- %s", tableComment);
-        // 构造表后缀注释
-        String tableSuffixComment = String.format("comment '%s'", tableComment);
         // 构造表字段
         List<MetaTable.MetaField> metaFieldList = metaTable.getMetaFieldList();
         StringBuilder fieldStrBuilder = new StringBuilder();
@@ -131,14 +134,27 @@ public class MysqlDialect implements SqlDialect {
             }
         }
         String fieldStr = fieldStrBuilder.toString();
+        // 构造注释
+        StringBuilder comment = new StringBuilder();
+        if(StrUtil.isNotBlank(tableComment)) {
+            comment.append(String.format("comment on table %s is '%s';", tableName, tableComment));
+        }
+        String fieldComments=metaFieldList.stream()
+                .filter((field)-> StrUtil.isNotBlank(field.getComment()))
+                .map((field)-> String.format("comment on column %s.%s is '%s';", wrapTableName(metaTable.getTableName()), wrapFieldName(field.getFieldName()), field.getComment()))
+                .collect(Collectors.joining("\n"));
+        if(StrUtil.isNotBlank(fieldComments)){
+            comment.append("\n").append(fieldComments);
+        }
         // 填充模板
-        return String.format(template, tablePrefixComment, tableName, fieldStr, tableSuffixComment);
+        return String.format(template, tablePrefixComment, tableName, fieldStr, comment);
     }
     
     /**
      * 生成创建字段的 SQL
      *
      * @param metaField
+     *
      * @return
      */
     @Override
@@ -150,17 +166,26 @@ public class MysqlDialect implements SqlDialect {
         String fieldType = metaField.getFieldType();
         String defaultValue = metaField.getDefaultValue();
         boolean notNull = metaField.isNotNull();
-        String comment = metaField.getComment();
         boolean primaryKey = metaField.isPrimaryKey();
         boolean autoIncrement = metaField.isAutoIncrement();
-        
+    
         StringBuilder fieldStrBuilder = new StringBuilder();
         // 字段名
         fieldStrBuilder.append(fieldName);
         // 字段类型
-        fieldStrBuilder.append(" ").append(fieldType);
-        if(Objects.equals(fieldType, "varchar")){
-            fieldStrBuilder.append("(255)");
+        // 是否自增
+        if (autoIncrement) {
+            switch (fieldType){
+                case "smallint":fieldStrBuilder.append(" ").append("smallserial");
+                case "integer":fieldStrBuilder.append(" ").append("serial");
+                case "bigint":fieldStrBuilder.append(" ").append("bigserial");
+            }
+        }
+        else{
+            fieldStrBuilder.append(" ").append(fieldType);
+            if(Objects.equals(fieldType, "varchar")){
+                fieldStrBuilder.append("(255)");
+            }
         }
         // 默认值
         if (StrUtil.isNotBlank(defaultValue)) {
@@ -168,14 +193,6 @@ public class MysqlDialect implements SqlDialect {
         }
         // 是否非空
         fieldStrBuilder.append(" ").append(notNull ? "not null" : "null");
-        // 是否自增
-        if (autoIncrement) {
-            fieldStrBuilder.append(" ").append("auto_increment");
-        }
-        // 注释
-        if (StrUtil.isNotBlank(comment)) {
-            fieldStrBuilder.append(" ").append(String.format("comment '%s'", comment));
-        }
         // 是否为主键
         if (primaryKey) {
             fieldStrBuilder.append(" ").append("primary key");
@@ -187,7 +204,8 @@ public class MysqlDialect implements SqlDialect {
      * 构造插入数据 SQL
      *
      * @param metaTable 表概要
-     * @param dataList 数据列表
+     * @param dataList  数据列表
+     *
      * @return 生成的 SQL 列表字符串
      */
     @Override
@@ -233,6 +251,6 @@ public class MysqlDialect implements SqlDialect {
     
     @Override
     public SQLCreateTableParser getSQLCreateTableParser(String createTableSql) {
-        return new MySqlCreateTableParser(createTableSql);
+        return new PGCreateTableParser(createTableSql);
     }
 }

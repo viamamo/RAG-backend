@@ -62,7 +62,7 @@ public class GeneratorFacade {
         
         // 校验
         validMetaTable(metaTable);
-        SqlDialect sqlDialect = SqlDialectFactory.getDialect(MockTool.getDatabaseTypeByName(metaTable.getDbType()));
+        SqlDialect sqlDialect = SqlDialectFactory.getDialect(MockTool.getDatabaseTypeByStr(metaTable.getDbType()));
         SqlBuilder sqlBuilder = new SqlBuilder(sqlDialect);
         // 构造建表 SQL
         String createSql = sqlBuilder.buildCreateTableSql(metaTable);

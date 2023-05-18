@@ -131,7 +131,7 @@ public class JavaCodeBuilder {
         }
         FieldType fieldType = Optional.ofNullable(MockTool.getFieldTypeByValue(metaField.getFieldType())).orElse(FieldType.TEXT);
         return switch (fieldType) {
-            case DATE, TIME, DATETIME, CHAR, VARCHAR, TINYTEXT, TEXT, MEDIUMTEXT, LONGTEXT, TINYBLOB, BLOB, MEDIUMBLOB, LONGBLOB, BINARY, VARBINARY ->
+            case DATE, TIME, CHAR, VARCHAR, TEXT, BINARY, VARBINARY ->
                     String.format("\"%s\"", value);
             default -> String.valueOf(value);
         };

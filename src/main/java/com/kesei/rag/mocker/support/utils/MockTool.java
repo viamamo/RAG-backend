@@ -75,7 +75,7 @@ public class MockTool {
     public static List<String> getDatabaseTypeList() {
         return DATABASE_TYPE_LIST;
     }
-    public static DatabaseType getDatabaseTypeByName(String name) {
-        return DATABASE_TYPE_MAP.getOrDefault(name, null);
+    public static DatabaseType getDatabaseTypeByStr(String str) {
+        return DATABASE_TYPE_MAP.getOrDefault(str, null);
     }
 }

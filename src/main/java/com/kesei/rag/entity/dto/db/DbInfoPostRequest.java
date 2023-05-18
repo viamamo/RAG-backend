@@ -3,6 +3,9 @@ package com.kesei.rag.entity.dto.db;
 import com.kesei.rag.entity.dto.GenericPostRequest;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.Map;
+
 /**
  * @author kesei
  */
@@ -16,7 +19,7 @@ public class DbInfoPostRequest extends GenericPostRequest {
     private String url;
     private String username;
     private String password;
-    private String property;
+    private ArrayList<Map<String,String>> property;
     private String host;
     private Integer port;
 }

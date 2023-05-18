@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.kesei</groupId>
     <artifactId>rag</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.2.0</version>
     <name>RAG-backend</name>
     <description>RAG-backend</description>
     <properties>
@@ -98,6 +98,11 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
+            <version>1.2.16</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid-spring-boot-starter</artifactId>
             <version>1.2.16</version>
         </dependency>
         <dependency>
