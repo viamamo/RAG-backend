@@ -1,6 +1,7 @@
 package com.kesei.rag.mocker.support.dialect;
 
 import com.kesei.rag.exception.GenericException;
+import com.kesei.rag.mocker.generator.DataGeneratorAnnotation;
 import com.kesei.rag.mocker.support.DatabaseType;
 import com.kesei.rag.mocker.support.ResponseCode;
 import com.kesei.rag.support.Constants;
@@ -15,6 +16,8 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * SQL方言工厂
+ * SQL方言工厂通过扫描 {@link SqlDialectAnnotation} 注解挂载生成器
  * @author kesei
  */
 @Component

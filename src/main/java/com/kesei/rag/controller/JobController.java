@@ -43,14 +43,20 @@ public class JobController {
     @Resource
     JobServiceImpl jobService;
     
+    /**
+     * 添加
+     *
+     * @param jobPostRequest post封装
+     * @return jobId
+     */
     @RequestMapping("/add")
-    public GenericResponse<Long> addJob(@RequestBody AddJobRequest addJobRequest, HttpServletRequest request){
+    public GenericResponse<Long> addJob(@RequestBody JobPostRequest jobPostRequest, HttpServletRequest request){
         JobInfo jobInfo=new JobInfo();
         UserInfo currentUser = userInfoService.getCurrentUser(request);
-        DbInfo dbInfo=dbInfoService.getById(addJobRequest.getDbInfoId());
+        DbInfo dbInfo=dbInfoService.getById(jobPostRequest.getDbInfoId());
         
         jobInfo.setUserId(currentUser.getId());
-        jobService.handleAdd(jobInfo, addJobRequest.getContent(), dbInfo);
+        jobService.handleAdd(jobInfo, jobPostRequest.getContent(), dbInfo);
         boolean result = jobService.save(jobInfo);
         if (!result) {
             throw new GenericException(ResponseCode.SQL_OPERATION_ERROR);
@@ -58,6 +64,12 @@ public class JobController {
         return ResponseUtils.success(jobInfo.getId());
     }
     
+    /**
+     * 删除
+     *
+     * @param jobPostRequest post封装
+     * @return 删除是否成功
+     */
     @PostMapping("/delete")
     public GenericResponse<Boolean> deleteJob(@RequestBody JobPostRequest jobPostRequest) {
         if (jobPostRequest == null || jobPostRequest.getId() <= 0) {
@@ -72,6 +84,13 @@ public class JobController {
         return ResponseUtils.success(jobService.removeById(id));
     }
     
+    /**
+     * 分页获取列表
+     *
+     * @param jobGetRequest get封装
+     * @return 分页
+     */
+    
     @GetMapping("/list/page")
     public GenericResponse<Page<JobInfo>> listJobByPage(JobGetRequest jobGetRequest) {
         long pageNum = jobGetRequest.getPaginationNum();
@@ -81,6 +100,13 @@ public class JobController {
         jobInfoPage.getRecords().forEach((record)-> record.setDbType(MockTool.getDatabaseTypeByStr(record.getDbType()).getName()));
         return ResponseUtils.success(jobInfoPage);
     }
+    
+    /**
+     * 执行作业
+     *
+     * @param jobPostRequest post封装
+     * @return 作业启动结果
+     */
     
     @RequestMapping("/execute")
     public GenericResponse<Boolean> executeJob(@RequestBody JobPostRequest jobPostRequest) {
@@ -101,6 +127,12 @@ public class JobController {
         return ResponseUtils.success(true);
     }
     
+    /**
+     * 回滚作业
+     *
+     * @param jobPostRequest post封装
+     * @return 作业回滚结果
+     */
     @RequestMapping("/rollback")
     public GenericResponse<Boolean> rollbackJob(@RequestBody JobPostRequest jobPostRequest){
         JobInfo jobInfo= jobService.getById(jobPostRequest.getId());
@@ -113,6 +145,12 @@ public class JobController {
         }
     }
     
+    /**
+     * 同步执行sql
+     *
+     * @param simpleExecutionRequest post封装
+     * @return 执行结果
+     */
     @RequestMapping("/execute/simple")
     public GenericResponse<Boolean> executeSqlSimple(@RequestBody SimpleExecutionRequest simpleExecutionRequest){
         DbInfo dbInfo=dbInfoService.getById(simpleExecutionRequest.getDbInfoId());
@@ -124,6 +162,12 @@ public class JobController {
         );
     }
     
+    /**
+     * 获取查询包装类
+     *
+     * @param jobGetRequest get封装
+     * @return mb+查询包装
+     */
     private QueryWrapper<JobInfo> getQueryWrapper(JobGetRequest jobGetRequest) {
         if (jobGetRequest == null) {
             throw new GenericException(ResponseCode.PARAMS_ERROR, "请求参数为空");

@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /**
+ * 反射工具类
+ *
  * @author kesei
  */
 @Slf4j
@@ -20,6 +22,12 @@ public class ReflectionUtils {
     
     public static final MetadataReaderFactory factory = new CachingMetadataReaderFactory(resolver);
     
+    /**
+     * 根据包名扫描类
+     *
+     * @param packageName 包名
+     * @return 类列表
+     */
     public static ArrayList<Class<?>> getResourcesByPackage(String packageName){
         String resourcePattern = "/**/*.class";
         String pattern = resolver.CLASSPATH_ALL_URL_PREFIX + ClassUtils
@@ -45,11 +53,6 @@ public class ReflectionUtils {
             } catch (ClassNotFoundException e) {
                 log.error("ReflectionUtils: class not found, resource:{}",resource.getFilename());
             }
-            // //判断类名上是否有  @UserLoginToken 注解
-            // UserLoginToken annotation = clazzName.getAnnotation(UserLoginToken.class);
-            // if (annotation != null) {
-            //     System.out.println("类中的注解："+ annotation.annotationType().getName());
-            // }
         }
         return classes;
     }

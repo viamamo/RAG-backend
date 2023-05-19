@@ -13,6 +13,8 @@ import org.springframework.stereotype.Component;
 import java.util.*;
 
 /**
+ * 数据生成Builder
+ *
  * @author kesei
  */
 @Component
@@ -22,12 +24,12 @@ public class DataBuilder {
     private DataGeneratorFactory dataGeneratorFactory;
     
     /**
-     * 生成数据
+     * 一次性生成数据
      *
-     * @param metaTable
-     * @param rowNum
+     * @param metaTable MetaTable
+     * @param rowNum 行数
      *
-     * @return
+     * @return 数据结果
      */
     public List<Map<String, Object>> generateData(MetaTable metaTable, int rowNum) {
         if(dataGeneratorFactory==null){
@@ -56,6 +58,15 @@ public class DataBuilder {
         return resultList;
     }
     
+    /**
+     * 分块生成数据
+     *
+     * @param metaTable MetaTable
+     * @param blockNumber 块号
+     * @param blockSize 块大小
+     *
+     * @return 数据结果
+     */
     public List<Map<String, Object>> generateDataByBlock(MetaTable metaTable, int blockNumber, int blockSize) {
         List<MetaTable.MetaField> fieldList = metaTable.getMetaFieldList();
         // 初始化结果数据

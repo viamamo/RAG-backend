@@ -40,6 +40,12 @@ public class DbInfoController{
     @Resource
     private UserInfoService userInfoService;
     
+    /**
+     * 添加
+     *
+     * @param dbInfoPostRequest post封装
+     * @return dbInfoID
+     */
     @RequestMapping("/add")
     public GenericResponse<Long> addDbInfo(@RequestBody DbInfoPostRequest dbInfoPostRequest, HttpServletRequest request){
         if (dbInfoPostRequest == null) {
@@ -68,8 +74,8 @@ public class DbInfoController{
     /**
      * 删除
      *
-     * @param dbInfoPostRequest
-     * @return
+     * @param dbInfoPostRequest post封装
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     public GenericResponse<Boolean> deleteDbInfo(@RequestBody DbInfoPostRequest dbInfoPostRequest) {
@@ -89,8 +95,8 @@ public class DbInfoController{
     /**
      * 根据 id 获取
      *
-     * @param id
-     * @return
+     * @param id dbInfoId
+     * @return  DbInfo
      */
     @GetMapping("/get")
     public GenericResponse<DbInfo> getDbInfoById(long id) {
@@ -105,8 +111,8 @@ public class DbInfoController{
     /**
      * 获取列表
      *
-     * @param dbInfoGetRequest
-     * @return
+     * @param dbInfoGetRequest get封装
+     * @return dbInfo列表
      */
     @GetMapping("/list")
     public GenericResponse<List<DbInfo>> listDbInfo(DbInfoGetRequest dbInfoGetRequest) {
@@ -118,8 +124,8 @@ public class DbInfoController{
     /**
      * 分页获取列表
      *
-     * @param dbInfoGetRequest
-     * @return
+     * @param dbInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/list/page")
     public GenericResponse<Page<DbInfo>> listDbInfoByPage(DbInfoGetRequest dbInfoGetRequest) {
@@ -134,8 +140,8 @@ public class DbInfoController{
     /**
      * 获取查询包装类
      *
-     * @param dbInfoGetRequest
-     * @return
+     * @param dbInfoGetRequest get封装
+     * @return mb+查询包装
      */
     private QueryWrapper<DbInfo> getQueryWrapper(DbInfoGetRequest dbInfoGetRequest) {
         if (dbInfoGetRequest == null) {

@@ -21,29 +21,17 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * Postgresql方言
  * @author kesei
  */
 @SqlDialectAnnotation(databaseType = DatabaseType.POSTGRESQL)
 public class PostgresqlDialect implements SqlDialect {
-    /**
-     * 封装字段名
-     *
-     * @param name
-     *
-     * @return
-     */
+    
     @Override
     public String wrapFieldName(String name) {
         return String.format("\"%s\"", name);
     }
     
-    /**
-     * 解析字段名
-     *
-     * @param fieldName
-     *
-     * @return
-     */
     @Override
     public String parseFieldName(String fieldName) {
         if (fieldName.startsWith("\"") && fieldName.endsWith("\"")) {
@@ -52,25 +40,11 @@ public class PostgresqlDialect implements SqlDialect {
         return fieldName;
     }
     
-    /**
-     * 封装表名
-     *
-     * @param name
-     *
-     * @return
-     */
     @Override
     public String wrapTableName(String name) {
         return String.format("\"%s\"", name);
     }
     
-    /**
-     * 解析表名
-     *
-     * @param tableName
-     *
-     * @return
-     */
     @Override
     public String parseTableName(String tableName) {
         if (tableName.startsWith("\"") && tableName.endsWith("\"")) {

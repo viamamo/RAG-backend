@@ -14,6 +14,8 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 /**
+ * 模拟工具类
+ *
  * @author kesei
  */
 @Component

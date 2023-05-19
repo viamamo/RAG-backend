@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 生成结果
  * @author kesei
  */
 @Data

@@ -1,6 +1,8 @@
 package com.kesei.rag.mocker.exception;
 
 /**
+ * 表信息异常封装
+ *
  * @author kesei
  */
 public class MetaTableException extends RuntimeException{

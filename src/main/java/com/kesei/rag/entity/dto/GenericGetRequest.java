@@ -7,6 +7,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
+ * 通用get封装
+ *
  * @author kesei
  */
 @Data

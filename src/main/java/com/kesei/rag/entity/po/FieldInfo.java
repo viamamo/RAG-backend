@@ -11,7 +11,7 @@ import java.io.Serializable;
 import java.util.Date;
 
 /**
- * 字段信息
+ * 字段定义
  * @author kesei
  */
 @TableName(value ="field_info")

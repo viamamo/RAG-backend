@@ -1,6 +1,8 @@
 package com.kesei.rag.support;
 
 /**
+ * 常量
+ *
  * @author kesei
  */
 public class Constants {

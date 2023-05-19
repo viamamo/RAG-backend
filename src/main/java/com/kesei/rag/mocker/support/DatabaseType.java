@@ -1,12 +1,11 @@
 package com.kesei.rag.mocker.support;
 
 /**
+ * 数据库类型
+ *
  * @author kesei
  */
 public enum DatabaseType {
-    /**
-     * 数据库类型
-     */
     MYSQL("MySQL","mysql://",3306),
     POSTGRESQL("PostgreSQL","postgresql://",5432),
     ORACLE("Oracle","oracle:thin:@",1521),

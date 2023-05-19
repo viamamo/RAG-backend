@@ -44,9 +44,8 @@ public class TableInfoController {
     /**
      * 创建
      *
-     * @param tableInfoPostRequest
-     * @param request
-     * @return
+     * @param tableInfoPostRequest post封装
+     * @return tableInfoId
      */
     @PostMapping("/add")
     public GenericResponse<Long> addTableInfo(@RequestBody TableInfoPostRequest tableInfoPostRequest,
@@ -70,9 +69,8 @@ public class TableInfoController {
     /**
      * 删除
      *
-     * @param tableInfoPostRequest
-     * @param request
-     * @return
+     * @param tableInfoPostRequest post封装
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     public GenericResponse<Boolean> deleteTableInfo(@RequestBody TableInfoPostRequest tableInfoPostRequest,
@@ -98,8 +96,8 @@ public class TableInfoController {
     /**
      * 根据 id 获取
      *
-     * @param id
-     * @return
+     * @param id tableInfoId
+     * @return tableInfo
      */
     @GetMapping("/get")
     public GenericResponse<TableInfo> getTableInfoById(long id) {
@@ -111,12 +109,11 @@ public class TableInfoController {
     }
     
     /**
-     * 获取列表（仅管理员可使用）
+     * 获取列表
      *
-     * @param tableInfoGetRequest
-     * @return
+     * @param tableInfoGetRequest get封装
+     * @return tableInfo列表
      */
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
     @GetMapping("/list")
     public GenericResponse<List<TableInfo>> listTableInfo(TableInfoGetRequest tableInfoGetRequest) {
         List<TableInfo> tableInfoList = tableInfoService.list(getQueryWrapper(tableInfoGetRequest));
@@ -126,9 +123,8 @@ public class TableInfoController {
     /**
      * 分页获取列表
      *
-     * @param tableInfoGetRequest
-     * @param request
-     * @return
+     * @param tableInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/list/page")
     public GenericResponse<Page<TableInfo>> listTableInfoByPage(TableInfoGetRequest tableInfoGetRequest,
@@ -143,9 +139,8 @@ public class TableInfoController {
     /**
      * 获取当前用户可选的全部资源列表（只返回 id 和名称）
      *
-     * @param tableInfoGetRequest
-     * @param request
-     * @return
+     * @param tableInfoGetRequest get封装
+     * @return tableInfo列表
      */
     @GetMapping("/my/list")
     public GenericResponse<List<TableInfo>> listMyTableInfo(TableInfoGetRequest tableInfoGetRequest,
@@ -177,9 +172,8 @@ public class TableInfoController {
     /**
      * 分页获取当前用户可选的资源列表
      *
-     * @param tableInfoGetRequest
-     * @param request
-     * @return
+     * @param tableInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/my/list/page")
     public GenericResponse<Page<TableInfo>> listMyTableInfoByPage(TableInfoGetRequest tableInfoGetRequest,
@@ -196,8 +190,8 @@ public class TableInfoController {
     /**
      * 获取查询包装类
      *
-     * @param tableInfoGetRequest
-     * @return
+     * @param tableInfoGetRequest get封装
+     * @return mb+查询包装
      */
     private QueryWrapper<TableInfo> getQueryWrapper(TableInfoGetRequest tableInfoGetRequest) {
         if (tableInfoGetRequest == null) {

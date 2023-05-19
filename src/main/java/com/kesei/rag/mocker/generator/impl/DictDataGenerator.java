@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Objects;
 
 /**
+ * 词库数据生成器
+ *
  * @author kesei
  */
 @DataGeneratorAnnotation(mockType = MockType.DICT)

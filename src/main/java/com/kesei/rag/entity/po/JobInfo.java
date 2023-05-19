@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Map;
 
 /**
+ * 作业
  * @author kesei
  */
 @TableName(value ="job_info")

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Typescript代码Builder
+ *
  * @author kesei
  */
 @Component
@@ -32,7 +34,7 @@ public class FrontendCodeBuilder {
     /**
      * 构造 Typescript 类型代码
      *
-     * @param metaTable 表概要
+     * @param metaTable MetaTable
      * @return 生成的代码
      */
     @SneakyThrows

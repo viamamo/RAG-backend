@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 生成器外观
+ *
  * @author kesei
  */
 @Component
@@ -53,9 +55,9 @@ public class GeneratorFacade {
     /**
      * 生成所有内容
      *
-     * @param metaTable
+     * @param metaTable MetaTable
      *
-     * @return
+     * @return 生成结果
      */
     public static GenerationVO generateAll(MetaTable metaTable) {
         long start=System.currentTimeMillis();
@@ -101,7 +103,7 @@ public class GeneratorFacade {
     /**
      * 校验MetaTable
      *
-     * @param metaTable 表定义
+     * @param metaTable MetaTable
      */
     public static void validMetaTable(MetaTable metaTable) {
         if (metaTable == null) {
@@ -129,9 +131,9 @@ public class GeneratorFacade {
     }
     
     /**
-     * 校验MetaTable
+     * 校验MetaTable 作业用
      *
-     * @param metaTable 表定义
+     * @param metaTable MetaTable
      */
     public static void validMetaTableJob(MetaTable metaTable) {
         if (metaTable == null) {
@@ -158,7 +160,7 @@ public class GeneratorFacade {
     /**
      * 校验MetaField
      *
-     * @param metaField 字段定义
+     * @param metaField MetaField
      */
     public static void validMetaField(MetaTable.MetaField metaField) {
         String fieldName = metaField.getFieldName();

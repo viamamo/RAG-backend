@@ -7,6 +7,8 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
+ * 通用响应封装
+ *
  * @author kesei
  */
 @Data

@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 全局信息
+ *
  * @author kesei
  */
 
@@ -24,7 +26,10 @@ public class BasicInfo {
     public List<Map<String,Object>> fakerTypes=new ArrayList<>();
     public List<Map<String,Object>> fieldTypes=new ArrayList<>();
     public List<Map<String,Object>> mockTypes=new ArrayList<>();
-
+    
+    /**
+     * 初始化全局信息
+     */
     @PostConstruct
     public void init(){
         for(DatabaseType databaseType:DatabaseType.values()){

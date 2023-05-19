@@ -1,12 +1,11 @@
 package com.kesei.rag.mocker.support;
 
 /**
+ * 字段类型 ANSI标准
+ *
  * @author kesei
  */
 public enum FieldType {
-    /**
-     * 字段类型 ANSI标准
-     */
     SMALLINT("smallint", "Integer", "number"),
     INTEGER("integer", "Integer", "number"),
     BIGINT("bigint", "Long", "number"),

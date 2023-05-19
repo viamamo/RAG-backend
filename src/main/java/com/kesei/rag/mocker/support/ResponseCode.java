@@ -3,6 +3,7 @@ package com.kesei.rag.mocker.support;
 import com.kesei.rag.support.Constants;
 
 /**
+ * 响应码封装
  * @author kesei
  */
 public enum ResponseCode {

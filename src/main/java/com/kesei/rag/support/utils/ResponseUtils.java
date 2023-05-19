@@ -4,6 +4,8 @@ import com.kesei.rag.entity.dto.GenericResponse;
 import com.kesei.rag.mocker.support.ResponseCode;
 
 /**
+ * 响应工具类
+ *
  * @author kesei
  */
 public class ResponseUtils {

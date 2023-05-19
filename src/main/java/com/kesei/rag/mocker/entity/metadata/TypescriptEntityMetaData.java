@@ -5,6 +5,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * Typescript实体元数据
+ *
  * @author kesei
  */
 @Data

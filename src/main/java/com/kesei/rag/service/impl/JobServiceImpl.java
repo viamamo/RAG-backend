@@ -113,10 +113,12 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         }
     }
     
+    @Override
     public Connection getSystemConnection() throws SQLException {
         return systemDataSource.getConnection();
     }
     
+    @Override
     public Connection getConnection(DbInfo dbInfo) {
         DataSource dataSource = getDataSource(dbInfo);
         try {
@@ -126,6 +128,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         }
     }
     
+    @Override
     public Boolean executeSimpleSql(Connection connection, String sqlString) {
         try {
             connection.setAutoCommit(false);
@@ -148,6 +151,7 @@ public class JobServiceImpl extends ServiceImpl<JobInfoMapper, JobInfo> implemen
         }
     }
     
+    @Override
     @Async
     public void executeJob(JobInfo jobInfo, Connection systemConnection, Connection connection) {
         long start1=System.currentTimeMillis();

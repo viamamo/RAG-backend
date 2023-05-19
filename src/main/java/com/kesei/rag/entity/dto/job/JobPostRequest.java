@@ -8,5 +8,6 @@ import lombok.Data;
  */
 @Data
 public class JobPostRequest extends GenericPostRequest {
+    private Long dbInfoId;
     private String operation;
 }

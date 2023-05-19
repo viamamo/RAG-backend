@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * Java代码生成器
+ *
  * @author kesei
  */
 @Component
@@ -39,7 +41,7 @@ public class JavaCodeBuilder {
     /**
      * 构造 Java 实体代码
      *
-     * @param metaTable 表概要
+     * @param metaTable MetaTable
      * @return 生成的 java 代码
      */
     @SneakyThrows
@@ -74,8 +76,8 @@ public class JavaCodeBuilder {
     /**
      * 构造 Java 对象代码
      *
-     * @param metaTable 表概要
-     * @param dataList    数据列表
+     * @param metaTable MetaTable
+     * @param dataList 数据列表
      * @return 生成的 java 代码
      */
     @SneakyThrows

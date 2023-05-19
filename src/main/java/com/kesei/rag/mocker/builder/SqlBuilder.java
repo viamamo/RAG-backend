@@ -17,6 +17,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * SqlBuilder
+ *
  * @author kesei
  */
 @Slf4j

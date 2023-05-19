@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * JsonBuilder
+ *
  * @author kesei
  */
 @Component
@@ -15,7 +17,6 @@ import java.util.Map;
 public class JsonBuilder {
     /**
      * 构造数据 json
-     * e.g. {"id": 1}
      *
      * @param dataList 数据列表
      * @return 生成的 json 数组字符串

@@ -3,7 +3,6 @@ package com.kesei.rag.controller;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.kesei.rag.aop.AuthCheck;
 import com.kesei.rag.entity.dto.GenericResponse;
 import com.kesei.rag.entity.dto.field.FieldInfoGetRequest;
 import com.kesei.rag.entity.dto.field.FieldInfoPostRequest;
@@ -44,9 +43,8 @@ public class FieldInfoController {
     /**
      * 创建
      *
-     * @param fieldInfoPostRequest
-     * @param request
-     * @return
+     * @param fieldInfoPostRequest post封装
+     * @return fieldInfoId
      */
     @PostMapping("/add")
     public GenericResponse<Long> addFieldInfo(@RequestBody FieldInfoPostRequest fieldInfoPostRequest,
@@ -70,9 +68,8 @@ public class FieldInfoController {
     /**
      * 删除
      *
-     * @param fieldInfoPostRequest
-     * @param request
-     * @return
+     * @param fieldInfoPostRequest post封装
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     public GenericResponse<Boolean> deleteFieldInfo(@RequestBody FieldInfoPostRequest fieldInfoPostRequest,
@@ -98,8 +95,8 @@ public class FieldInfoController {
     /**
      * 根据 id 获取
      *
-     * @param id
-     * @return
+     * @param id fieldInfoId
+     * @return fieldInfo
      */
     @GetMapping("/get")
     public GenericResponse<FieldInfo> getFieldInfoById(long id) {
@@ -111,23 +108,22 @@ public class FieldInfoController {
     }
     
     /**
-     * 获取列表（仅管理员可使用）
+     * 获取列表
      *
-     * @param fieldInfoQueryRequest
-     * @return
+     * @param fieldInfoGetRequest get封装
+     * @return fieldInfo列表
      */
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
     @GetMapping("/list")
-    public GenericResponse<List<FieldInfo>> listFieldInfo(FieldInfoGetRequest fieldInfoQueryRequest) {
-        List<FieldInfo> fieldInfoList = fieldInfoService.list(getQueryWrapper(fieldInfoQueryRequest));
+    public GenericResponse<List<FieldInfo>> listFieldInfo(FieldInfoGetRequest fieldInfoGetRequest) {
+        List<FieldInfo> fieldInfoList = fieldInfoService.list(getQueryWrapper(fieldInfoGetRequest));
         return ResponseUtils.success(fieldInfoList);
     }
     
     /**
      * 分页获取列表
      *
-     * @param fieldInfoGetRequest
-     * @return
+     * @param fieldInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/list/page")
     public GenericResponse<Page<FieldInfo>> listFieldInfoByPage(FieldInfoGetRequest fieldInfoGetRequest) {
@@ -141,9 +137,8 @@ public class FieldInfoController {
     /**
      * 获取当前用户可选的全部资源列表（只返回 id 和名称）
      *
-     * @param fieldInfoGetRequest
-     * @param request
-     * @return
+     * @param fieldInfoGetRequest get封装
+     * @return dictInfo列表
      */
     @GetMapping("/my/list")
     public GenericResponse<List<FieldInfo>> listMyFieldInfo(FieldInfoGetRequest fieldInfoGetRequest,
@@ -175,9 +170,8 @@ public class FieldInfoController {
     /**
      * 分页获取当前用户可选的资源列表
      *
-     * @param fieldInfoGetRequest
-     * @param request
-     * @return
+     * @param fieldInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/my/list/page")
     public GenericResponse<Page<FieldInfo>> listMyFieldInfoByPage(FieldInfoGetRequest fieldInfoGetRequest,
@@ -194,8 +188,8 @@ public class FieldInfoController {
     /**
      * 获取查询包装类
      *
-     * @param fieldInfoGetRequest
-     * @return
+     * @param fieldInfoGetRequest get封装
+     * @return mb+查询包装
      */
     private QueryWrapper<FieldInfo> getQueryWrapper(FieldInfoGetRequest fieldInfoGetRequest) {
         if (fieldInfoGetRequest == null) {

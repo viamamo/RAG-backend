@@ -6,6 +6,8 @@ import lombok.Data;
 import java.util.List;
 
 /**
+ * 元表 表信息载体
+ *
  * @author kesei
  */
 @Data
@@ -37,7 +39,7 @@ public class MetaTable {
     private Integer mockNum;
     
     /**
-     * 列信息列表
+     * 元字段 字段信息载体
      */
     private List<MetaField> metaFieldList;
     @Data
@@ -78,7 +80,7 @@ public class MetaTable {
         private boolean autoIncrement;
         
         /**
-         * 模拟类型（随机、图片、规则、词库）
+         * 模拟类型
          */
         private String mockType;
         

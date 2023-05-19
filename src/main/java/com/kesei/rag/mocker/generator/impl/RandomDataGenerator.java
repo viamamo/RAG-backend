@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * 随机数据生成器
+ *
  * @author kesei
  */
 @DataGeneratorAnnotation(mockType = MockType.RANDOM)

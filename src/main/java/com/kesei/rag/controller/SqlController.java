@@ -44,11 +44,27 @@ public class SqlController {
     @Resource
     private BasicInfo basicInfo;
     
+    private final ThreadLocal<GenerationVO> generationVOThreadLocal=new ThreadLocal<>();
+    
+    /**
+     * 根据 MetaTable 生成
+     *
+     * @param metaTable MetaTable
+     * @return 生成结果
+     */
     @PostMapping("/generate/schema")
     public GenericResponse<GenerationVO> generateBySchema(@RequestBody MetaTable metaTable) {
-        return ResponseUtils.success(sqlService.generateBySchema(metaTable));
+        GenerationVO generationVO=sqlService.generateBySchema(metaTable);
+        generationVOThreadLocal.set(generationVO);
+        return ResponseUtils.success(generationVO);
     }
     
+    /**
+     * 根据语义自动获取 MetaTable
+     *
+     * @param autoPostRequest post封装
+     * @return 解析完成的MetaTable
+     */
     @PostMapping("/get/schema/auto")
     public GenericResponse<MetaTable> getSchemaByAuto(@RequestBody GenericPostRequest autoPostRequest) {
         if (autoPostRequest == null) {
@@ -58,10 +74,10 @@ public class SqlController {
     }
     
     /**
-     * 根据 SQL 获取 schema
+     * 根据 SQL 获取 MetaTable
      *
-     * @param generateFromSqlRequest
-     * @return
+     * @param generateFromSqlRequest post封装
+     * @return 解析完成的MetaTable
      */
     @PostMapping("/get/schema/sql")
     public GenericResponse<MetaTable> getSchemaBySql(@RequestBody GenerateFromSqlRequest generateFromSqlRequest) {
@@ -72,6 +88,13 @@ public class SqlController {
         return ResponseUtils.success(sqlService.getSchemaBySql(generateFromSqlRequest.getContent(), sqlDialect));
     }
     
+    /**
+     * 根据Excel 获取 MetaTable
+     *
+     * @param file excel文件
+     * @return 解析完成的MetaTable
+     */
+    
     @PostMapping("/get/schema/excel")
     public GenericResponse<MetaTable> getSchemaByExcel(MultipartFile file) {
         return ResponseUtils.success(sqlService.getSchemaByExcel(file));
@@ -80,7 +103,7 @@ public class SqlController {
     /**
      * 下载模拟数据 Excel
      *
-     * @param response
+     * @param generationVO 生成结果
      */
     @PostMapping("/download/data/excel")
     public void downloadDataExcel(@RequestBody GenerationVO generationVO, HttpServletResponse response) {
@@ -119,7 +142,10 @@ public class SqlController {
         }
     }
     
-    
+    /**
+     * 全局信息初始化
+     * @return 全局信息
+     */
     @GetMapping("/get_basic_info")
     public GenericResponse<JSONObject> getBasicInfo(){
         return ResponseUtils.success(JSONUtil.parseObj(basicInfo));

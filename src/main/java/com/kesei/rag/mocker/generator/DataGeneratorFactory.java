@@ -13,6 +13,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
+ * 数据生成器工厂
+ * 数据生成器工厂通过扫描 {@link DataGeneratorAnnotation} 注解挂载生成器
  * @author kesei
  */
 
@@ -25,6 +27,9 @@ public class DataGeneratorFactory {
      */
     private final Map<MockType, DataGenerator> MOCK_TYPE_DATA_GENERATOR_MAP = new ConcurrentHashMap<>();
     
+    /**
+     * 初始化挂载生成器
+     */
     @PostConstruct
     public void init() {
         ArrayList<Class<?>> classes = ReflectionUtils.getResourcesByPackage(Constants.GENERATOR_PACKAGE);

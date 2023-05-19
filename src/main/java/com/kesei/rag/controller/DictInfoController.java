@@ -39,6 +39,12 @@ public class DictInfoController {
     @Resource
     private UserInfoService userInfoService;
     
+    /**
+     * 添加
+     *
+     * @param dictInfoPostRequest post封装
+     * @return dictInfoID
+     */
     @PostMapping("/add")
     public GenericResponse<Long> addDictInfo(@RequestBody DictInfoPostRequest dictInfoPostRequest, HttpServletRequest request) {
         if (dictInfoPostRequest == null) {
@@ -59,6 +65,9 @@ public class DictInfoController {
     
     /**
      * 删除
+     *
+     * @param dictInfoPostRequest post封装
+     * @return 删除是否成功
      */
     @PostMapping("/delete")
     public GenericResponse<Boolean> deleteDictInfo(@RequestBody DictInfoPostRequest dictInfoPostRequest, HttpServletRequest request) {
@@ -83,8 +92,8 @@ public class DictInfoController {
     /**
      * 根据 id 获取
      *
-     * @param id
-     * @return
+     * @param id dictInfoId
+     * @return dictInfo
      */
     @GetMapping("/get")
     public GenericResponse<DictInfo> getDictInfoById(long id) {
@@ -96,12 +105,11 @@ public class DictInfoController {
     }
     
     /**
-     * 获取列表（仅管理员可使用）
+     * 获取列表
      *
-     * @param dictInfoGetRequest
-     * @return
+     * @param dictInfoGetRequest get封装
+     * @return dictInfo列表
      */
-    @AuthCheck(mustRole = Constants.ROLE_ADMIN)
     @GetMapping("/list")
     public GenericResponse<List<DictInfo>> listDictInfo(DictInfoGetRequest dictInfoGetRequest) {
         List<DictInfo> dictInfoList = dictInfoService.list(getQueryWrapper(dictInfoGetRequest));
@@ -111,8 +119,8 @@ public class DictInfoController {
     /**
      * 分页获取列表
      *
-     * @param dictInfoGetRequest
-     * @return
+     * @param dictInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/list/page")
     public GenericResponse<Page<DictInfo>> listDictInfoByPage(DictInfoGetRequest dictInfoGetRequest) {
@@ -126,9 +134,8 @@ public class DictInfoController {
     /**
      * 获取当前用户可选的全部资源列表（只返回 id 和名称）
      *
-     * @param dictInfoGetRequest
-     * @param request
-     * @return
+     * @param dictInfoGetRequest get封装
+     * @return dictInfo列表
      */
     @GetMapping("/my/list")
     public GenericResponse<List<DictInfo>> listMyDictInfo(DictInfoGetRequest dictInfoGetRequest,
@@ -160,9 +167,8 @@ public class DictInfoController {
     /**
      * 分页获取当前用户可选的资源列表
      *
-     * @param dictInfoGetRequest
-     * @param request
-     * @return
+     * @param dictInfoGetRequest get封装
+     * @return 分页
      */
     @GetMapping("/my/list/page")
     public GenericResponse<Page<DictInfo>> listMyDictInfoByPage(DictInfoGetRequest dictInfoGetRequest,
@@ -179,8 +185,8 @@ public class DictInfoController {
     /**
      * 获取查询包装类
      *
-     * @param dictInfoGetRequest
-     * @return
+     * @param dictInfoGetRequest get封装
+     * @return mb+查询包装
      */
     private QueryWrapper<DictInfo> getQueryWrapper(DictInfoGetRequest dictInfoGetRequest) {
         if (dictInfoGetRequest == null) {

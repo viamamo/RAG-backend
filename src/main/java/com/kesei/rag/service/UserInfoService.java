@@ -27,7 +27,7 @@ public interface UserInfoService extends IService<UserInfo> {
      * @param userAccount 用户账户
      * @param userPassword 用户密码
      * @param request request
-     * @return 脱敏后的用户信息
+     * @return 用户信息
      */
     UserInfo userLogin(String userAccount, String userPassword, HttpServletRequest request);
     

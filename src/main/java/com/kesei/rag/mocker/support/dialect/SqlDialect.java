@@ -19,44 +19,44 @@ public interface SqlDialect {
     
     /**
      * 封装字段名
-     * @param name
-     * @return
+     * @param name 字段名
+     * @return 封装结果
      */
     String wrapFieldName(String name);
     
     /**
      * 解析字段名
-     * @param fieldName
-     * @return
+     * @param fieldName 字段名
+     * @return 解析结果
      */
     String parseFieldName(String fieldName);
     
     /**
      * 封装表名
-     * @param name
-     * @return
+     * @param name 表名
+     * @return 封装结果
      */
     String wrapTableName(String name);
     
     /**
      * 解析表名
-     * @param tableName
-     * @return
+     * @param tableName 表名
+     * @return 解析结果
      */
     String parseTableName(String tableName);
     
     /**
      * 获取判断列是否存在的SQL
      *
-     * @param jobInfo
-     * @param columnName
+     * @param jobInfo JobInfo
+     * @param columnName 列名
      */
     String getColumnIsExistSql(JobInfo jobInfo, String columnName);
     
     /**
      * 构造建表 SQL
      *
-     * @param metaTable 表概要
+     * @param metaTable MetaTable
      * @return 生成的 SQL
      */
      String buildCreateTableSql(MetaTable metaTable);
@@ -64,15 +64,15 @@ public interface SqlDialect {
     /**
      * 生成创建字段的 SQL
      *
-     * @param metaField
-     * @return
+     * @param metaField MetaField
+     * @return 生成的 SQL
      */
      String buildCreateFieldSql(MetaTable.MetaField metaField);
     
     /**
      * 构造插入数据 SQL
      *
-     * @param metaTable 表概要
+     * @param metaTable MetaTable
      * @param dataList 数据列表
      * @return 生成的 SQL 列表字符串
      */
@@ -81,9 +81,9 @@ public interface SqlDialect {
     /**
      * 根据列的属性获取值字符串
      *
-     * @param metaField
-     * @param value
-     * @return
+     * @param metaField MetaField
+     * @param value 列属性
+     * @return 值字符串
      */
     default String getValueStr(MetaTable.MetaField metaField, Object value) {
         if (metaField == null || value == null) {
@@ -101,6 +101,11 @@ public interface SqlDialect {
         };
     }
     
+    /**
+     * 获取建表Sql解析器
+     * @param createTableSql 建表 SQL
+     * @return 建表sql解析器
+     */
     SQLCreateTableParser getSQLCreateTableParser(String createTableSql);
     
 }

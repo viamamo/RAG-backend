@@ -22,28 +22,18 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
+ * MySQL方言
+ *
  * @author kesei
  */
 @SqlDialectAnnotation(databaseType = DatabaseType.MYSQL)
 public class MysqlDialect implements SqlDialect {
     
-    /**
-     * 封装字段名
-     *
-     * @param name
-     * @return
-     */
     @Override
     public String wrapFieldName(String name) {
         return String.format("`%s`", name);
     }
     
-    /**
-     * 解析字段名
-     *
-     * @param fieldName
-     * @return
-     */
     @Override
     public String parseFieldName(String fieldName) {
         if (fieldName.startsWith(Constants.MYSQL_ESCAPE_CHARACTER) && fieldName.endsWith(Constants.MYSQL_ESCAPE_CHARACTER)) {
@@ -52,23 +42,11 @@ public class MysqlDialect implements SqlDialect {
         return fieldName;
     }
     
-    /**
-     * 包装表名
-     *
-     * @param name
-     * @return
-     */
     @Override
     public String wrapTableName(String name) {
         return String.format("`%s`", name);
     }
     
-    /**
-     * 解析表名
-     *
-     * @param tableName
-     * @return
-     */
     @Override
     public String parseTableName(String tableName) {
         if (tableName.startsWith(Constants.MYSQL_ESCAPE_CHARACTER) && tableName.endsWith(Constants.MYSQL_ESCAPE_CHARACTER)) {
@@ -77,23 +55,11 @@ public class MysqlDialect implements SqlDialect {
         return tableName;
     }
     
-    /**
-     * 获取判断列是否存在的SQL
-     *
-     * @param jobInfo
-     * @param columnName
-     */
     @Override
     public String getColumnIsExistSql(JobInfo jobInfo, String columnName) {
         return "SELECT `COLUMN_NAME` FROM `INFORMATION_SCHEMA`.`COLUMNS` WHERE `TABLE_SCHEMA`='"+jobInfo.getDbName()+"' AND `TABLE_NAME`='"+jobInfo.getTableName()+"' AND `COLUMN_NAME`='"+columnName+"'";
     }
     
-    /**
-     * 构造建表 SQL
-     *
-     * @param metaTable 表概要
-     * @return 生成的 SQL
-     */
     @Override
     public String buildCreateTableSql(MetaTable metaTable) {
         // 构造模板
@@ -135,12 +101,6 @@ public class MysqlDialect implements SqlDialect {
         return String.format(template, tablePrefixComment, tableName, fieldStr, tableSuffixComment);
     }
     
-    /**
-     * 生成创建字段的 SQL
-     *
-     * @param metaField
-     * @return
-     */
     @Override
     public String buildCreateFieldSql(MetaTable.MetaField metaField) {
         if (metaField == null) {

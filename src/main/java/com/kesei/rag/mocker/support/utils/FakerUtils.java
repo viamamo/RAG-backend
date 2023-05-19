@@ -10,6 +10,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
 /**
+ * 随机生成数据封装
+ *
  * @author kesei
  */
 public class FakerUtils {

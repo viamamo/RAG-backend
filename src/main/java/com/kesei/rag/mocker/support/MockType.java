@@ -1,12 +1,11 @@
 package com.kesei.rag.mocker.support;
 
 /**
+ * 模拟类型
+ *
  * @author kesei
  */
 public enum MockType {
-    /**
-     * 模拟类型
-     */
     NONE("不模拟", ""),
     INCREASE("递增", "起始值"),
     FIXED("固定", "固定值"),

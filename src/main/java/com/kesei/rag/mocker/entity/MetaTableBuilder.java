@@ -33,6 +33,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
+ * MetaTableBuilder
+ *
  * @author kesei
  */
 @Component
@@ -47,11 +49,10 @@ public class MetaTableBuilder {
     }
     
     /**
-     * 智能构建
+     * 自动构建
      *
-     * @param content
-     *
-     * @return
+     * @param content 逗号分隔的字段名
+     * @return 解析完成的MetaTable
      */
     public static MetaTable buildFromAuto(String content) {
         if (StrUtil.isBlank(content)) {
@@ -94,8 +95,7 @@ public class MetaTableBuilder {
      * 根据建表 SQL 构建
      *
      * @param sql 建表 SQL
-     *
-     * @return 生成的 TableSchema
+     * @return 解析完成的MetaTable
      */
     public static MetaTable buildFromSql(String sql,SqlDialect sqlDialect) {
         if (StrUtil.isBlank(sql)) {
@@ -163,8 +163,7 @@ public class MetaTableBuilder {
      * 根据 Excel 文件构建
      *
      * @param file Excel 文件
-     *
-     * @return 生成的 TableSchema
+     * @return 解析完成的MetaTable
      */
     public static MetaTable buildFromExcel(MultipartFile file) {
         try {
@@ -213,9 +212,9 @@ public class MetaTableBuilder {
     /**
      * 判断字段类型
      *
-     * @param value
+     * @param value 值内容
      *
-     * @return
+     * @return 字段类型
      */
     public static String getFieldTypeByValue(String value) {
         if (StrUtil.isBlank(value)) {

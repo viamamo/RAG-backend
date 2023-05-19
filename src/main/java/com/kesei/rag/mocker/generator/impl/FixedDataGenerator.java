@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 固定值数据生成器
+ *
  * @author kesei
  */
 @DataGeneratorAnnotation(mockType = MockType.FIXED)

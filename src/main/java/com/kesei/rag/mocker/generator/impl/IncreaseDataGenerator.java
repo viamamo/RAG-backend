@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * 递增值数据生成器
+ *
  * @author kesei
  */
 @DataGeneratorAnnotation(mockType = MockType.INCREASE)

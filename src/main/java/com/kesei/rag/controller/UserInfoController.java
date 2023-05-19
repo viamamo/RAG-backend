@@ -30,8 +30,8 @@ public class UserInfoController {
     /**
      * 用户注册
      *
-     * @param userInfoPostRequest
-     * @return
+     * @param userInfoPostRequest post封装
+     * @return 用户id
      */
     @PostMapping("/register")
     public GenericResponse<Long> userRegister(@RequestBody UserInfoPostRequest userInfoPostRequest, HttpServletRequest request) {
@@ -53,9 +53,8 @@ public class UserInfoController {
     /**
      * 用户登录
      *
-     * @param userInfoPostRequest
-     * @param request
-     * @return
+     * @param userInfoPostRequest post封装
+     * @return 用户信息
      */
     @PostMapping("/login")
     public GenericResponse<UserInfo> userLogin(@RequestBody UserInfoPostRequest userInfoPostRequest, HttpServletRequest request) {
@@ -75,8 +74,7 @@ public class UserInfoController {
     /**
      * 用户注销
      *
-     * @param request
-     * @return
+     * @return 注销是否成功
      */
     @PostMapping("/logout")
     public GenericResponse<Boolean> userLogout(HttpServletRequest request) {
@@ -90,8 +88,7 @@ public class UserInfoController {
     /**
      * 获取当前登录用户
      *
-     * @param request
-     * @return
+     * @return 当前用户信息
      */
     @GetMapping("/get/login")
     public GenericResponse<UserVO> getCurrentUser(HttpServletRequest request) {

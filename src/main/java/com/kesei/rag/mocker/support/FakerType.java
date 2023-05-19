@@ -1,12 +1,11 @@
 package com.kesei.rag.mocker.support;
 
 /**
+ * Faker模拟数据类型
+ *
  * @author kesei
  */
 public enum FakerType {
-    /**
-     * Faker模拟数据类型
-     */
     STRING("字符串"),
     NAME("人名"),
     CITY("城市"),

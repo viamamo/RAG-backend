@@ -13,6 +13,8 @@ import java.util.Date;
 import java.util.List;
 
 /**
+ * 默认值数据生成器(不模拟)
+ *
  * @author kesei
  */
 @DataGeneratorAnnotation(mockType = MockType.NONE)
