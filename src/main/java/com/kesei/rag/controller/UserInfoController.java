@@ -17,7 +17,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @RestController
 @RequestMapping("/user_info")

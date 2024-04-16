@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 全局信息
  *
- * @author kesei
+ * @author viamamo
  */
 
 @Component

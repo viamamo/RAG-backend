@@ -13,7 +13,7 @@ import java.util.Map;
 
 /**
  * 作业
- * @author kesei
+ * @author viamamo
  */
 @TableName(value ="job_info")
 @Data

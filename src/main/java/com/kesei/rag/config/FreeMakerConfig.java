@@ -5,7 +5,7 @@ import freemarker.template.TemplateExceptionHandler;
 import org.springframework.context.annotation.Bean;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 
 @org.springframework.context.annotation.Configuration

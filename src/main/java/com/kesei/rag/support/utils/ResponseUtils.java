@@ -6,7 +6,7 @@ import com.kesei.rag.mocker.support.ResponseCode;
 /**
  * 响应工具类
  *
- * @author kesei
+ * @author viamamo
  */
 public class ResponseUtils {
     public static <T> GenericResponse<T> success(T data){

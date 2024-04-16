@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 固定值数据生成器
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.FIXED)
 public class FixedDataGenerator implements DataGenerator {

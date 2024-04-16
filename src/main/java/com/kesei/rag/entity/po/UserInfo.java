@@ -9,7 +9,7 @@ import java.util.Date;
 
 /**
  * 用户
- * @author kesei
+ * @author viamamo
  */
 @TableName(value = "user_info")
 @Data

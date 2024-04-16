@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * 元表 表信息载体
  *
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class MetaTable {

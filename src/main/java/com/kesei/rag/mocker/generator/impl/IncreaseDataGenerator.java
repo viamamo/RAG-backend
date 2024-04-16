@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 递增值数据生成器
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.INCREASE)
 public class IncreaseDataGenerator implements DataGenerator {

@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 通用响应封装
  *
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class GenericResponse<T> implements Serializable {

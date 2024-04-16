@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * 数据库
- * @author kesei
+ * @author viamamo
  */
 @TableName(value ="db_info")
 @Data

@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 /**
  * 全局异常处理器
- * @author kesei
+ * @author viamamo
  */
 @RestControllerAdvice
 @Slf4j

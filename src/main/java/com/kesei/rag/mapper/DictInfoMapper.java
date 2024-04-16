@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kesei.rag.entity.po.DictInfo;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface DictInfoMapper extends BaseMapper<DictInfo> {
 

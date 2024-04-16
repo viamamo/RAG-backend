@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * Postgresql方言
- * @author kesei
+ * @author viamamo
  */
 @SqlDialectAnnotation(databaseType = DatabaseType.POSTGRESQL)
 public class PostgresqlDialect implements SqlDialect {

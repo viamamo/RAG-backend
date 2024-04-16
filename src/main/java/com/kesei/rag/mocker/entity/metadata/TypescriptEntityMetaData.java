@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Typescript实体元数据
  *
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class TypescriptEntityMetaData {

@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * 表定义
- * @author kesei
+ * @author viamamo
  */
 @TableName(value ="table_info")
 @Data

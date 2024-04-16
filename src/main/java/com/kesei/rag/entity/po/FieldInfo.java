@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * 字段定义
- * @author kesei
+ * @author viamamo
  */
 @TableName(value ="field_info")
 @Data

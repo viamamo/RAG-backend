@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kesei.rag.entity.po.DictInfo;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface DictInfoService extends IService<DictInfo> {
     

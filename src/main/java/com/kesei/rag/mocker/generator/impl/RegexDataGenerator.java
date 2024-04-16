@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * 正则数据生成器
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.REGEX)
 public class RegexDataGenerator implements DataGenerator {

@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * SQL方言标记
- * @author kesei
+ * @author viamamo
  */
 
 @Retention(RetentionPolicy.RUNTIME)

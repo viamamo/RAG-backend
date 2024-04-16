@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 默认值数据生成器(不模拟)
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.NONE)
 public class DefaultDataGenerator implements DataGenerator {

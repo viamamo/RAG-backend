@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * 词库
- * @author kesei
+ * @author viamamo
  */
 @TableName(value ="dict_info")
 @Data

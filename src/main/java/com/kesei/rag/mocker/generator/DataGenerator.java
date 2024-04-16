@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * 数据生成器接口
  *
- * @author kesei
+ * @author viamamo
  */
 public interface DataGenerator {
     

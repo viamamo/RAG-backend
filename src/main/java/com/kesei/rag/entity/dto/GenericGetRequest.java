@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 通用get封装
  *
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class GenericGetRequest implements Serializable {

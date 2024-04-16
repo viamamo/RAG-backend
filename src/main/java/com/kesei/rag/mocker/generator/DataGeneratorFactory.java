@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * 数据生成器工厂
  * 数据生成器工厂通过扫描 {@link DataGeneratorAnnotation} 注解挂载生成器
- * @author kesei
+ * @author viamamo
  */
 
 @Component

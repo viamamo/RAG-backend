@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @RestController
 @RequestMapping("/db_info")

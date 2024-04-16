@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * 数据生成器标记
  * @
- * @author kesei
+ * @author viamamo
  */
 
 @Retention(RetentionPolicy.RUNTIME)

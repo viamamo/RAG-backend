@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * 通用post封装
  *
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class GenericPostRequest implements Serializable {

@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * SQL方言工厂
  * SQL方言工厂通过扫描 {@link SqlDialectAnnotation} 注解挂载生成器
- * @author kesei
+ * @author viamamo
  */
 @Component
 @Slf4j

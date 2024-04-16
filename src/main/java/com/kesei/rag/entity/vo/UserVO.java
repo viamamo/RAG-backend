@@ -8,7 +8,7 @@ import java.util.Date;
 
 /**
  * 用户信息
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class UserVO implements Serializable {

@@ -3,7 +3,7 @@ package com.kesei.rag.mocker.support;
 /**
  * Faker模拟数据类型
  *
- * @author kesei
+ * @author viamamo
  */
 public enum FakerType {
     STRING("字符串"),

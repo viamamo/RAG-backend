@@ -19,7 +19,7 @@ import java.util.Objects;
 /**
  * 词库数据生成器
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.DICT)
 public class DictDataGenerator implements DataGenerator {

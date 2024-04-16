@@ -15,7 +15,7 @@ import java.util.Optional;
 /**
  * 随机数据生成器
  *
- * @author kesei
+ * @author viamamo
  */
 @DataGeneratorAnnotation(mockType = MockType.RANDOM)
 public class RandomDataGenerator implements DataGenerator {

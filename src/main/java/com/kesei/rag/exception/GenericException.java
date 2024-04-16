@@ -4,7 +4,7 @@ import com.kesei.rag.mocker.support.ResponseCode;
 
 /**
  * 通用异常
- * @author kesei
+ * @author viamamo
  */
 public class GenericException extends RuntimeException{
     

@@ -31,7 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @RestController
 @RequestMapping("/sql")

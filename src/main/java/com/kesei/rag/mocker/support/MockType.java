@@ -3,7 +3,7 @@ package com.kesei.rag.mocker.support;
 /**
  * 模拟类型
  *
- * @author kesei
+ * @author viamamo
  */
 public enum MockType {
     NONE("不模拟", ""),

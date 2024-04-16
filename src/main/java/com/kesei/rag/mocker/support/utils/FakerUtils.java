@@ -12,7 +12,7 @@ import java.util.Locale;
 /**
  * 随机生成数据封装
  *
- * @author kesei
+ * @author viamamo
  */
 public class FakerUtils {
     

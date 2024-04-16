@@ -28,7 +28,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @RestController
 @RequestMapping("/dict_info")

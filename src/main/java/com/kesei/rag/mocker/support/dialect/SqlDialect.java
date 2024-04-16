@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface SqlDialect {
     

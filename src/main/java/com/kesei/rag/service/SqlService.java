@@ -6,7 +6,7 @@ import com.kesei.rag.mocker.support.dialect.SqlDialect;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface SqlService {
     

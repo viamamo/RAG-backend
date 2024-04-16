@@ -3,7 +3,7 @@ package com.kesei.rag.support;
 /**
  * 常量
  *
- * @author kesei
+ * @author viamamo
  */
 public class Constants {
     

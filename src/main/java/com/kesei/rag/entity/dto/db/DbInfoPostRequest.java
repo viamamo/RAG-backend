@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class DbInfoPostRequest extends GenericPostRequest {

@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 /**
  * 模拟工具类
  *
- * @author kesei
+ * @author viamamo
  */
 @Component
 public class MockTool {

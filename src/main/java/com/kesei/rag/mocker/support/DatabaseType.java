@@ -3,7 +3,7 @@ package com.kesei.rag.mocker.support;
 /**
  * 数据库类型
  *
- * @author kesei
+ * @author viamamo
  */
 public enum DatabaseType {
     MYSQL("MySQL","mysql://",3306),

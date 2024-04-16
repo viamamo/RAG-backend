@@ -4,7 +4,7 @@ import com.kesei.rag.entity.dto.GenericGetRequest;
 import lombok.Data;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class TableInfoGetRequest extends GenericGetRequest {

@@ -10,7 +10,7 @@ import java.util.Map;
 
 /**
  * 生成结果
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class GenerationVO implements Serializable {

@@ -4,7 +4,7 @@ import com.kesei.rag.support.Constants;
 
 /**
  * 响应码封装
- * @author kesei
+ * @author viamamo
  */
 public enum ResponseCode {
     

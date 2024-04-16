@@ -3,7 +3,7 @@ package com.kesei.rag.mocker.support;
 /**
  * 字段类型 ANSI标准
  *
- * @author kesei
+ * @author viamamo
  */
 public enum FieldType {
     SMALLINT("smallint", "Integer", "number"),

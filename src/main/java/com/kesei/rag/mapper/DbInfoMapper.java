@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.kesei.rag.entity.po.DbInfo;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface DbInfoMapper extends BaseMapper<DbInfo> {
 

@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.kesei.rag.entity.po.TableInfo;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface TableInfoService extends IService<TableInfo> {
     

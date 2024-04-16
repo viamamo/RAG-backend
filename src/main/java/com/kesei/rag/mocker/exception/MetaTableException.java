@@ -3,7 +3,7 @@ package com.kesei.rag.mocker.exception;
 /**
  * 表信息异常封装
  *
- * @author kesei
+ * @author viamamo
  */
 public class MetaTableException extends RuntimeException{
     

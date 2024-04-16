@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 /**
  * SqlBuilder
  *
- * @author kesei
+ * @author viamamo
  */
 @Slf4j
 public class SqlBuilder {

@@ -29,7 +29,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @RestController
 @RequestMapping("job")

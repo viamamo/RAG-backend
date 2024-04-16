@@ -4,7 +4,7 @@ import com.kesei.rag.entity.dto.GenericPostRequest;
 import lombok.Data;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 @Data
 public class JobPostRequest extends GenericPostRequest {

@@ -5,7 +5,7 @@ import com.kesei.rag.entity.po.UserInfo;
 import jakarta.servlet.http.HttpServletRequest;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface UserInfoService extends IService<UserInfo> {
     

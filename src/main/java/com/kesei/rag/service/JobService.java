@@ -8,7 +8,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
- * @author kesei
+ * @author viamamo
  */
 public interface JobService extends IService<JobInfo> {
     
